@@ -1,0 +1,203 @@
+---
+import Base from '../layouts/Base.astro'
+import Breadcrumbs from '../components/Breadcrumbs.astro'
+import Mark from '../components/Mark.astro'
+import { categoryCount, departments } from '../data/catalogue'
+import { address, company, emails, fax, phones } from '../data/site'
+---
+
+<Base
+  title="About Optima Industrial Solutions | Medical supplies, Kitwe"
+  description="Optima Industrial Solutions Limited supplies medical equipment, hospital furniture, consumables and laboratory ware from Plot 1051, Accra Road, Kitwe, Zambia."
+>
+  <section class="about-hero on-indigo">
+    <div class="container about-hero__grid">
+      <div>
+        <Breadcrumbs trail={[{ href: '/', label: 'Home' }, { label: 'About' }]} />
+        <h1>A medical supplier in Kitwe’s Light Industrial Area</h1>
+      </div>
+      <div class="about-hero__mark">
+        <Mark size={220} label="Optima mark" />
+        <p>Company profile {company.profileYear} · Medical supplies</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container about-grid">
+      <div class="prose" data-reveal>
+        <p class="lead">
+          {company.legalName} works from {address.street}, {address.town}. Its medical supplies range covers {departments.length}
+          {' '}departments and {categoryCount} product categories, set out in the company’s {company.profileYear} profile.
+        </p>
+        <p>
+          The range runs from diagnostic and theatre equipment to the consumables a ward goes through every week, plus
+          laboratory chemicals and glassware. For sterile services rooms, Optima also installs autoclaves and maintains them.
+        </p>
+        <p>
+          Prices and stock are not listed on this site. Every order starts with a quote: build a list, send it, and we reply
+          with prices and availability.
+        </p>
+        <div class="about-actions">
+          <a class="btn" href="/products">Browse the range</a>
+          <a class="btn btn--outline" href="/contact">Contact us</a>
+        </div>
+      </div>
+
+      <aside class="facts" aria-labelledby="facts-title" data-reveal style="--reveal-delay:80ms">
+        <h2 id="facts-title">Company details</h2>
+        <dl>
+          <div><dt>Registered name</dt><dd>{company.legalName}</dd></div>
+          <div><dt>Address</dt><dd>{address.lines.map((l) => <span>{l}</span>)}</dd></div>
+          <div><dt>Mobile</dt><dd>{phones.map((p) => <a href={p.href}>{p.display}</a>)}</dd></div>
+          <div><dt>Fax</dt><dd>{fax.display}</dd></div>
+          <div><dt>Email</dt><dd>{emails.map((e) => <a href={`mailto:${e}`}>{e}</a>)}</dd></div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section range" aria-labelledby="range-title">
+    <div class="container">
+      <h2 id="range-title" data-reveal>The range, by department</h2>
+      <ul class="range__list">
+        {
+          departments.map((d, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 40}ms`}>
+              <a href={`/products/${d.slug}`}>
+                <span class="range__name">{d.name}</span>
+                <span class="range__summary">{d.summary}</span>
+                <span class="range__count">{d.categories.length} categories</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about-hero {
+    padding-block: var(--s-6) var(--s-8);
+  }
+  .about-hero :global(.crumbs) {
+    --muted: var(--on-indigo-muted);
+  }
+  .about-hero :global(.crumbs a) {
+    color: #fff;
+  }
+  .about-hero__grid {
+    display: grid;
+    gap: var(--s-7);
+    align-items: end;
+  }
+  @media (min-width: 768px) {
+    .about-hero__grid {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+  .about-hero h1 {
+    max-width: 14ch;
+  }
+  .about-hero__mark {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-4);
+    color: var(--on-indigo-muted);
+    font-size: var(--fs-small);
+  }
+  .about-hero__mark :global(svg) {
+    width: min(160px, 40vw);
+    height: auto;
+  }
+  .about-grid {
+    display: grid;
+    gap: var(--s-8);
+  }
+  @media (min-width: 1024px) {
+    .about-grid {
+      grid-template-columns: 7fr 5fr;
+    }
+  }
+  .about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+  }
+  .facts {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    padding: var(--s-5);
+    align-self: start;
+  }
+  .facts h2 {
+    font-size: 2rem;
+    margin-bottom: var(--s-4);
+  }
+  .facts dl {
+    margin: 0;
+  }
+  .facts dl > div {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-3) 0;
+    border-top: 1px solid var(--border);
+  }
+  .facts dt {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+  .facts dd {
+    margin: 0;
+    display: grid;
+    word-break: break-word;
+  }
+  .facts a {
+    color: var(--navy);
+    font-weight: 600;
+  }
+  .range {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .range__list {
+    list-style: none;
+    margin: var(--s-6) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .range__list a {
+    display: grid;
+    gap: var(--s-1) var(--s-5);
+    padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: padding-left var(--dur-2) var(--ease-out);
+  }
+  @media (min-width: 768px) {
+    .range__list a {
+      grid-template-columns: 1.1fr 1.6fr auto;
+      align-items: baseline;
+    }
+  }
+  .range__list a:hover {
+    padding-left: var(--s-3);
+  }
+  .range__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.75rem;
+    line-height: 1.1;
+    color: var(--navy);
+  }
+  .range__summary {
+    color: var(--muted);
+  }
+  .range__count {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+</style>

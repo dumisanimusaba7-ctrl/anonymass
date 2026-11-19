@@ -1,0 +1,373 @@
+---
+import Mark from './Mark.astro'
+import { phones, whatsappLink, whatsapp } from '../data/site'
+
+const nav = [
+  { href: '/products', label: 'Products' },
+  { href: '/products/laboratory', label: 'Laboratory' },
+  { href: '/sterile-services', label: 'Sterile services' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+]
+---
+
+<header class="site-header on-indigo" transition:persist="site-header" data-header>
+  <div class="container site-header__inner">
+    <a class="brand" href="/">
+      <Mark size={34} class="brand__mark" id="header-mark" />
+      <span class="brand__text">
+        <span class="brand__name">Optima</span>
+        <span class="brand__division">Medical Supplies</span>
+      </span>
+    </a>
+
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href} data-nav-link>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="quote-link" href="/quote" data-nav-link data-quote-target>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M7 3h10l2 2v16H5V5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path>
+          <path d="M9 9h6M9 13h6M9 17h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+        <span class="quote-link__label">Quote list</span>
+        <span class="quote-count" data-quote-count data-count="0" aria-label="0 items">0</span>
+      </a>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="site-menu" data-menu-button>
+        <span class="visually-hidden">Menu</span>
+        <span class="menu-button__lines" aria-hidden="true"><span></span><span></span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="site-menu on-indigo" id="site-menu" data-menu hidden>
+    <div class="container site-menu__inner">
+      <nav aria-label="Menu">
+        <ul class="site-menu__links">
+          <li style="--i:0"><a href="/">Home</a></li>
+          {
+            nav.map((item, i) => (
+              <li style={`--i:${i + 1}`}>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+          <li style={`--i:${nav.length + 1}`}><a href="/quote">Quote list</a></li>
+        </ul>
+      </nav>
+      <div class="site-menu__contact" style={`--i:${nav.length + 2}`}>
+        <a class="btn btn--light" href={whatsappLink('Hello Optima, I would like a quote for:')}>
+          WhatsApp {whatsapp.display}
+        </a>
+        <a class="btn btn--outline-light" href={phones[0].href}>Call {phones[0].display}</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid rgb(255 255 255 / 0.14);
+  }
+  .site-header__inner {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    margin-right: auto;
+    min-height: 44px;
+  }
+  .brand :global(.brand__mark) {
+    transition: transform var(--dur-3) var(--ease-out);
+  }
+  .brand__text {
+    display: grid;
+    line-height: 1;
+  }
+  .brand__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .brand__division {
+    font-size: 0.75rem;
+    color: var(--on-indigo-muted);
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+  }
+
+  .site-nav {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .site-nav {
+      display: block;
+    }
+  }
+  .site-nav ul {
+    display: flex;
+    gap: var(--s-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .site-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    text-decoration: none;
+    font-weight: 500;
+    color: var(--on-indigo-muted);
+    border-bottom: 2px solid transparent;
+    transition:
+      color var(--dur-1) var(--ease-out),
+      border-color var(--dur-1) var(--ease-out);
+  }
+  .site-nav a:hover {
+    color: #fff;
+  }
+  .site-nav a[aria-current='page'] {
+    color: #fff;
+    border-bottom-color: #fff;
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .quote-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    border: 1px solid rgb(255 255 255 / 0.35);
+    border-radius: var(--r-2);
+    text-decoration: none;
+    font-weight: 600;
+    transition:
+      border-color var(--dur-1) var(--ease-out),
+      background-color var(--dur-1) var(--ease-out);
+  }
+  .quote-link:hover,
+  .quote-link[aria-current='page'] {
+    border-color: #fff;
+    background: rgb(255 255 255 / 0.08);
+  }
+  .quote-link__label {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    .quote-link__label {
+      display: inline;
+    }
+  }
+  .quote-count {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 11px;
+    display: inline-grid;
+    place-items: center;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    background: rgb(255 255 255 / 0.16);
+    color: #fff;
+    transition: background-color var(--dur-2) var(--ease-out);
+  }
+  .quote-count:not([data-count='0']) {
+    background: var(--red);
+  }
+  .quote-count.is-bumped {
+    animation: count-bump 360ms var(--ease-out);
+  }
+  @keyframes count-bump {
+    40% {
+      transform: scale(1.35);
+    }
+  }
+
+  .menu-button {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+  @media (min-width: 1024px) {
+    .menu-button {
+      display: none;
+    }
+  }
+  .menu-button__lines {
+    width: 24px;
+    height: 12px;
+    position: relative;
+  }
+  .menu-button__lines span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #fff;
+    border-radius: 1px;
+    transition: transform var(--dur-2) var(--ease-out);
+  }
+  .menu-button__lines span:first-child {
+    top: 0;
+  }
+  .menu-button__lines span:last-child {
+    bottom: 0;
+  }
+  .menu-button[aria-expanded='true'] .menu-button__lines span:first-child {
+    transform: translateY(5px) rotate(45deg);
+  }
+  .menu-button[aria-expanded='true'] .menu-button__lines span:last-child {
+    transform: translateY(-5px) rotate(-45deg);
+  }
+
+  /* Full-screen menu, opened with a circular wipe from the menu button. */
+  .site-menu {
+    position: fixed;
+    inset: var(--header-h) 0 0 0;
+    z-index: 1;
+    overflow-y: auto;
+    clip-path: circle(0 at var(--cx, 100%) var(--cy, 0));
+    transition: clip-path var(--dur-3) var(--ease-in);
+  }
+  .site-menu.is-open {
+    clip-path: circle(150% at var(--cx, 100%) var(--cy, 0));
+    transition: clip-path 520ms var(--ease-out);
+  }
+  .site-menu__inner {
+    padding-block: var(--s-6) var(--s-8);
+    display: grid;
+    gap: var(--s-7);
+  }
+  .site-menu__links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .site-menu__links li,
+  .site-menu__contact {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity var(--dur-2) var(--ease-out),
+      transform var(--dur-2) var(--ease-out);
+  }
+  .site-menu.is-open .site-menu__links li,
+  .site-menu.is-open .site-menu__contact {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(120ms + var(--i) * 40ms);
+  }
+  .site-menu__links a {
+    display: block;
+    padding: var(--s-2) 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 2.5rem;
+    line-height: 1.1;
+    text-decoration: none;
+    border-bottom: 1px solid rgb(255 255 255 / 0.14);
+  }
+  .site-menu__links a[aria-current='page'] {
+    color: var(--ice);
+  }
+  .site-menu__contact {
+    display: grid;
+    gap: var(--s-3);
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!
+  const button = header.querySelector<HTMLButtonElement>('[data-menu-button]')!
+  const menu = header.querySelector<HTMLElement>('[data-menu]')!
+  const mark = header.querySelector<SVGElement>('#header-mark')!
+  let turns = 0
+
+  function setOpen(open: boolean) {
+    if (open === (button.getAttribute('aria-expanded') === 'true')) return
+    button.setAttribute('aria-expanded', String(open))
+    document.documentElement.style.overflow = open ? 'hidden' : ''
+    if (open) {
+      const r = button.getBoundingClientRect()
+      menu.style.setProperty('--cx', `${r.left + r.width / 2}px`)
+      menu.style.setProperty('--cy', `${r.top + r.height / 2 - header.getBoundingClientRect().bottom}px`)
+      menu.hidden = false
+      requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.add('is-open')))
+    } else {
+      menu.classList.remove('is-open')
+      const done = () => {
+        if (!menu.classList.contains('is-open')) menu.hidden = true
+      }
+      matchMedia('(prefers-reduced-motion: reduce)').matches ? done() : setTimeout(done, 450)
+    }
+  }
+
+  button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'))
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false)
+  })
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+      setOpen(false)
+      button.focus()
+    }
+  })
+  matchMedia('(min-width: 1024px)').addEventListener('change', (e) => e.matches && setOpen(false))
+
+  // Mark the current section in both navs.
+  function markCurrent() {
+    const path = location.pathname.replace(/\/$/, '') || '/'
+    header.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((a) => {
+      const href = a.getAttribute('href')!.replace(/\/$/, '') || '/'
+      const current =
+        href === path || (href === '/products' && path.startsWith('/products/') && path !== '/products/laboratory')
+      if (current && href !== '/') a.setAttribute('aria-current', 'page')
+      else a.removeAttribute('aria-current')
+    })
+  }
+
+  // The mark turns a quarter each time you change page.
+  document.addEventListener('astro:before-preparation', () => {
+    turns += 1
+    mark.style.transform = `rotate(${turns * 90}deg)`
+    setOpen(false)
+  })
+  document.addEventListener('astro:page-load', markCurrent)
+</script>

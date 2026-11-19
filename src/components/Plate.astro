@@ -1,0 +1,59 @@
+---
+// A catalogue plate: sky-blue label bar over a white photo well, the way the
+// company profile presents each category.
+import { Image } from 'astro:assets'
+import AddToQuote from './AddToQuote.astro'
+import type { Category, Department } from '../data/catalogue'
+
+interface Props {
+  category: Category
+  department: Department
+  headingLevel?: 'h2' | 'h3'
+  /** Eager-load when the plate is likely above the fold. */
+  eager?: boolean
+  showDepartment?: boolean
+}
+const { category, department, headingLevel = 'h3', eager = false, showDepartment = false } = Astro.props
+const Heading = headingLevel
+// Never upscale small catalogue photos: cap the display width at 1.5× source.
+const maxWidth = Math.round(category.image.width * 1.5)
+---
+
+<article class="plate" id={category.slug} data-category={category.slug} data-department={department.slug}>
+  <Heading class="plate__label">{category.name}</Heading>
+  <div class="plate__well">
+    <Image
+      src={category.image}
+      alt={category.alt}
+      widths={[240, 360, 480, Math.min(720, category.image.width)].filter((w) => w <= category.image.width)}
+      sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 90vw"
+      loading={eager ? 'eager' : 'lazy'}
+      style={`--max-w:${maxWidth}px`}
+    />
+  </div>
+  <div class="plate__body">
+    {showDepartment && <a class="plate__tag" href={`/products/${department.slug}`}>{department.name}</a>}
+    <p>{category.shown}</p>
+    {category.service && <p class="plate__service"><strong>Service:</strong> {category.service}</p>}
+    {
+      category.items ? (
+        <div class="plate__actions">
+          <a class="link-arrow" href={`/products/${department.slug}#${category.slug}`}>
+            <span class="link-arrow__text">{category.items.length} items, pick from the list</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      ) : (
+        <div class="plate__actions">
+          <AddToQuote id={category.slug} name={category.name} group={department.name} />
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .plate__service {
+    color: var(--navy) !important;
+  }
+</style>

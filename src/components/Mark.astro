@@ -1,0 +1,51 @@
+---
+// The Optima mark, redrawn as a vector from the company profile.
+// Always shown on the brand indigo, as in the profile.
+import { BLADES, BLADE_COLOURS, toPath } from '../scripts/mark-geometry'
+
+interface Props {
+  size?: number
+  class?: string
+  /** Decorative by default; pass a label when the mark stands alone. */
+  label?: string
+  id?: string
+}
+const { size = 40, class: className = '', label, id } = Astro.props
+---
+
+<svg
+  id={id}
+  class:list={['mark', className]}
+  viewBox="0 0 100 100"
+  width={size}
+  height={size}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  <g class="mark__blades">
+    {
+      BLADES.map((pts, i) => (
+        <path
+          class="mark__blade"
+          data-blade={i}
+          d={toPath(pts)}
+          fill={BLADE_COLOURS[i]}
+          stroke={BLADE_COLOURS[i]}
+          stroke-width="4"
+          stroke-linejoin="round"
+        />
+      ))
+    }
+  </g>
+</svg>
+
+<style>
+  .mark {
+    overflow: visible;
+  }
+  .mark__blades {
+    transform-origin: 50px 50px;
+  }
+</style>

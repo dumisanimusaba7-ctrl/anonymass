@@ -1,0 +1,231 @@
+---
+import Base from '../layouts/Base.astro'
+import Breadcrumbs from '../components/Breadcrumbs.astro'
+import { address, emails, fax, phones, whatsapp, whatsappLink } from '../data/site'
+---
+
+<Base
+  title="Contact Optima | Kitwe medical supplies, phone and WhatsApp"
+  description="Call, WhatsApp, email or visit Optima Industrial Solutions at Plot 1051, Accra Road, Light Industrial Area, Kitwe, Zambia."
+>
+  <section class="contact">
+    <div class="container contact__grid">
+      <div class="contact__info">
+        <Breadcrumbs trail={[{ href: '/', label: 'Home' }, { label: 'Contact' }]} />
+        <h1>Call, message or visit</h1>
+        <p class="lead">For prices and availability, the quickest route is a quote list sent on WhatsApp.</p>
+
+        <ul class="channels">
+          <li>
+            <span class="channels__label">WhatsApp</span>
+            <a href={whatsappLink('Hello Optima, ')}>{whatsapp.display}</a>
+          </li>
+          {
+            phones.map((p) => (
+              <li>
+                <span class="channels__label">Call</span>
+                <a href={p.href}>{p.display}</a>
+              </li>
+            ))
+          }
+          {
+            emails.map((e) => (
+              <li>
+                <span class="channels__label">Email</span>
+                <a href={`mailto:${e}`}>{e}</a>
+              </li>
+            ))
+          }
+          <li>
+            <span class="channels__label">Fax</span>
+            <span>{fax.display}</span>
+          </li>
+        </ul>
+
+        <div class="visit">
+          <h2>Visit</h2>
+          <address>
+            {address.lines.map((l) => <span>{l}</span>)}
+          </address>
+          <a class="link-arrow" href={address.mapsUrl} target="_blank" rel="noopener">
+            <span class="link-arrow__text">Get directions in Google Maps</span><span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+
+      <form class="enquiry" data-enquiry novalidate>
+        <h2>Send an enquiry</h2>
+        <p class="enquiry__intro">Fill this in and we open WhatsApp or your email app with the message ready to send.</p>
+
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" autocomplete="name" required aria-describedby="f-name-err" />
+          <p class="field__error" id="f-name-err" hidden>Add your name so we know who to reply to.</p>
+        </div>
+        <div class="field">
+          <label for="f-facility">Hospital, clinic or company <span>Optional</span></label>
+          <input id="f-facility" name="facility" autocomplete="organization" />
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone number <span>Optional</span></label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+        </div>
+        <div class="field">
+          <label for="f-message">What do you need?</label>
+          <textarea id="f-message" name="message" rows="5" required aria-describedby="f-message-err"></textarea>
+          <p class="field__error" id="f-message-err" hidden>Tell us what you need, for example the item and quantity.</p>
+        </div>
+
+        <div class="enquiry__actions">
+          <button class="btn" type="submit" value="whatsapp">Send on WhatsApp</button>
+          <button class="btn btn--outline" type="submit" value="email">Send by email</button>
+        </div>
+        <p class="enquiry__done" role="status" data-done hidden></p>
+      </form>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact {
+    padding-block: var(--s-6) var(--s-9);
+  }
+  .contact__grid {
+    display: grid;
+    gap: var(--s-8);
+  }
+  @media (min-width: 1024px) {
+    .contact__grid {
+      grid-template-columns: 6fr 5fr;
+      align-items: start;
+    }
+  }
+  .contact h1 {
+    color: var(--navy);
+    max-width: 10ch;
+  }
+  .contact .lead {
+    color: var(--muted);
+    margin-top: var(--s-4);
+  }
+  .channels {
+    list-style: none;
+    margin: var(--s-6) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .channels li {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: var(--s-3);
+    align-items: baseline;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--border);
+    word-break: break-word;
+  }
+  .channels__label {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+  .channels a {
+    font-size: var(--fs-lead);
+    font-weight: 600;
+    color: var(--navy);
+  }
+  .visit {
+    margin-top: var(--s-7);
+  }
+  .visit h2 {
+    font-size: 2rem;
+  }
+  .visit address {
+    font-style: normal;
+    display: grid;
+    margin: var(--s-3) 0 var(--s-2);
+    font-size: var(--fs-lead);
+  }
+
+  .enquiry {
+    display: grid;
+    gap: var(--s-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    padding: var(--s-5);
+  }
+  @media (min-width: 640px) {
+    .enquiry {
+      padding: var(--s-6);
+    }
+  }
+  .enquiry h2 {
+    font-size: 2.25rem;
+  }
+  .enquiry__intro {
+    color: var(--muted);
+    margin-top: calc(var(--s-3) * -1);
+  }
+  .enquiry__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+  .enquiry__done {
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-2);
+    background: var(--sky-100);
+    color: var(--navy);
+  }
+</style>
+
+<script>
+  import { onPage } from '../scripts/motion'
+  import { mailLink, whatsappLink } from '../data/site'
+
+  onPage(() => {
+    const form = document.querySelector<HTMLFormElement>('[data-enquiry]')
+    if (!form) return
+    const done = form.querySelector<HTMLElement>('[data-done]')!
+    const topic = new URLSearchParams(location.search).get('topic')
+    if (topic) (form.elements.namedItem('message') as HTMLTextAreaElement).value = `About ${topic}: `
+
+    const check = (input: HTMLInputElement | HTMLTextAreaElement) => {
+      const ok = !input.required || input.value.trim() !== ''
+      input.setAttribute('aria-invalid', String(!ok))
+      document.getElementById(`${input.id}-err`)?.toggleAttribute('hidden', ok)
+      return ok
+    }
+    form.querySelectorAll<HTMLInputElement>('[required]').forEach((el) => el.addEventListener('blur', () => check(el)))
+
+    const onSubmit = (e: SubmitEvent) => {
+      e.preventDefault()
+      const required = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')]
+      const valid = required.map(check).every(Boolean)
+      if (!valid) {
+        required.find((el) => el.getAttribute('aria-invalid') === 'true')?.focus()
+        return
+      }
+      const v = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).value.trim()
+      const text = [
+        'Hello Optima,',
+        '',
+        v('message'),
+        '',
+        `From: ${[v('name'), v('facility')].filter(Boolean).join(', ')}`,
+        v('phone') ? `Phone: ${v('phone')}` : '',
+      ]
+        .join('\n')
+        .trim()
+      const via = (e.submitter as HTMLButtonElement | null)?.value === 'email' ? 'email' : 'whatsapp'
+      if (via === 'email') location.href = mailLink(`Enquiry from ${v('name')}`, text)
+      else window.open(whatsappLink(text), '_blank', 'noopener')
+      done.hidden = false
+      done.textContent =
+        via === 'email'
+          ? 'Your email app should now be open with the message. Press send there to reach us.'
+          : 'WhatsApp should now be open with your message. Press send there to reach us.'
+    }
+    form.addEventListener('submit', onSubmit)
+    return () => form.removeEventListener('submit', onSubmit)
+  })
+</script>

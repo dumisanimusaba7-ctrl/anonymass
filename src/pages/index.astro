@@ -1,0 +1,758 @@
+---
+import { Image } from 'astro:assets'
+import Base from '../layouts/Base.astro'
+import Mark from '../components/Mark.astro'
+import QuotePreview from '../components/QuotePreview.astro'
+import { categoryCount, departmentBySlug, departments, labItemCount } from '../data/catalogue'
+import { address, emails, phones, whatsappLink } from '../data/site'
+
+import labGlassware from '../assets/products/lab-glassware.jpg'
+import surgicalInstruments from '../assets/products/surgical-instruments.jpg'
+import hospitalFurniture from '../assets/products/hospital-furniture.jpg'
+import packingTable from '../assets/products/packing-table.jpg'
+import pouchSealer from '../assets/products/pouch-sealer.jpg'
+import autoclave from '../assets/products/autoclave.jpg'
+import sterileShelving from '../assets/products/sterile-shelving.jpg'
+
+const lab = departmentBySlug('laboratory')!
+const stations = [
+  { step: 'Pack', name: 'Packing tables', image: packingTable, alt: 'Stainless packing table' },
+  { step: 'Seal', name: 'Pouch sealers', image: pouchSealer, alt: 'Continuous pouch sealer' },
+  { step: 'Sterilise', name: 'Autoclaves', image: autoclave, alt: 'Floor-standing autoclave' },
+  { step: 'Store', name: 'Sterile shelving', image: sterileShelving, alt: 'Wire shelving on castors' },
+]
+---
+
+<Base
+  title="Optima Medical Supplies | Hospital, theatre and lab supplies in Kitwe"
+  description="Medical equipment, hospital furniture, theatre supplies, consumables and laboratory ware from Optima Industrial Solutions in Kitwe, Zambia. Build a quote list and send it on WhatsApp."
+>
+  <!-- Hero -->
+  <section class="hero on-indigo" data-hero>
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">Medical supplies · Kitwe, Zambia</p>
+        <h1>Send one list. Equip the ward, the theatre and the lab.</h1>
+        <p class="lead">
+          Optima supplies medical equipment, hospital furniture, consumables and laboratory ware. Pick what you need,
+          send us the list, and we reply with a quote.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--light" href="/products">Start a quote list</a>
+          <a class="btn btn--outline-light" href={whatsappLink('Hello Optima, I would like a quote for:')}>
+            WhatsApp us
+          </a>
+        </div>
+        <p class="hero__call">Prefer to call? <a href={phones[0].href}>{phones[0].display}</a></p>
+      </div>
+
+      <div class="hero__visual" aria-hidden="true">
+        <div class="lens lens--a" data-lens>
+          <Image src={labGlassware} alt="" widths={[320, 520]} sizes="(min-width: 1024px) 340px, 52vw" loading="eager" fetchpriority="high" />
+        </div>
+        <div class="lens lens--b" data-lens>
+          <Image src={surgicalInstruments} alt="" widths={[240, 400]} sizes="(min-width: 1024px) 220px, 34vw" loading="eager" />
+        </div>
+        <div class="lens lens--c" data-lens>
+          <Image src={hospitalFurniture} alt="" widths={[200, 360]} sizes="(min-width: 1024px) 180px, 28vw" loading="eager" />
+        </div>
+        <Mark size={240} class="hero__mark" id="hero-mark" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Departments -->
+  <section class="section depts" aria-labelledby="depts-title">
+    <div class="container">
+      <div class="depts__head" data-reveal>
+        <h2 id="depts-title">What we supply</h2>
+        <p class="lead">
+          <span data-count-to={categoryCount}>{categoryCount}</span> product categories in six departments, from our 2024
+          company profile. Pick a department to see what's in it.
+        </p>
+      </div>
+
+      <div class="depts__ui" data-dept-selector>
+        <div class="depts__tabs" role="tablist" aria-label="Departments">
+          {
+            departments.map((d, i) => (
+              <button
+                class="dept-tab"
+                role="tab"
+                id={`tab-${d.slug}`}
+                aria-controls={`panel-${d.slug}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                data-slug={d.slug}
+              >
+                <span class="dept-tab__name">{d.name}</span>
+                <span class="dept-tab__count">{d.categories.length}</span>
+              </button>
+            ))
+          }
+        </div>
+
+        <div class="depts__stage">
+          {
+            departments.map((d, i) => (
+              <div
+                class="dept-panel"
+                role="tabpanel"
+                id={`panel-${d.slug}`}
+                aria-labelledby={`tab-${d.slug}`}
+                hidden={i !== 0}
+                data-slug={d.slug}
+              >
+                <div class="lens dept-panel__lens" data-dept-lens>
+                  <Image src={d.image} alt={d.alt} widths={[320, 480, Math.min(640, d.image.width)].filter((w) => w <= d.image.width)} sizes="(min-width: 1024px) 360px, 72vw" />
+                </div>
+                <div class="dept-panel__text">
+                  <p class="dept-panel__summary">{d.summary}</p>
+                  <ul class="dept-panel__list">
+                    {d.categories.map((c, j) => (
+                      <li style={`--i:${j}`}>
+                        <a href={`/products/${d.slug}#${c.slug}`}>{c.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                  <a class="btn" href={`/products/${d.slug}`} data-dept-link>
+                    Open {d.short.toLowerCase()}
+                  </a>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Laboratory -->
+  <section class="lab on-navy" aria-labelledby="lab-title">
+    <div class="lab__photo">
+      <Image src={lab.image} alt={lab.alt} widths={[480, 800, 1184]} sizes="(min-width: 1024px) 50vw, 100vw" />
+    </div>
+    <div class="lab__body">
+      <div class="lab__inner">
+        <p class="eyebrow" data-reveal>Laboratory</p>
+        <h2 id="lab-title" data-reveal>Lab ware, listed item by item</h2>
+        <p class="lead" data-reveal>
+          <span data-count-to={labItemCount}>{labItemCount}</span> chemicals, glass and plastic items you can tick straight
+          onto your quote list.
+        </p>
+        <div class="lab__lists" data-reveal>
+          {
+            lab.categories.map((c) => (
+              <div class="lab__group">
+                <h3>
+                  {c.name} <span>{c.items!.length}</span>
+                </h3>
+                <ul>
+                  {c.items!.slice(0, 5).map((item) => (
+                    <li>{item}</li>
+                  ))}
+                  {c.items!.length > 5 && <li class="lab__more">and {c.items!.length - 5} more</li>}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+        <a class="btn btn--light" href="/products/laboratory" data-reveal>Pick lab items</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sterile services -->
+  <section class="section section--tall sterile" aria-labelledby="sterile-title">
+    <div class="container sterile__grid">
+      <div class="sterile__text" data-reveal>
+        <p class="eyebrow">Sterile services</p>
+        <h2 id="sterile-title">Kit out the room where instruments get sterilised</h2>
+        <p class="lead">
+          Packing tables, pouch sealers, autoclaves and sterile shelving. We also install autoclaves and maintain them.
+        </p>
+        <a class="link-arrow" href="/sterile-services">
+          <span class="link-arrow__text">Walk through the sterile services room</span><span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <ol class="flow" aria-label="Sterile services steps">
+        {
+          stations.map((s, i) => (
+            <li class="flow__station" data-reveal style={`--reveal-delay:${i * 70}ms`}>
+              <div class="flow__img">
+                <Image src={s.image} alt={s.alt} widths={[200, Math.min(340, s.image.width)]} sizes="160px" />
+              </div>
+              <span class="flow__step">{s.step}</span>
+              <span class="flow__name">{s.name}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- How ordering works -->
+  <section class="section order" aria-labelledby="order-title">
+    <div class="container order__grid">
+      <div data-reveal>
+        <p class="eyebrow">How ordering works</p>
+        <h2 id="order-title">Your list, sent your way</h2>
+        <ol class="order__steps">
+          <li>
+            <p>
+              <strong>Add products to your quote list.</strong> Quantities and notes are optional. The list stays in this
+              browser.
+            </p>
+          </li>
+          <li>
+            <p><strong>Send it on WhatsApp or by email.</strong> It arrives as a plain list we can read on any phone.</p>
+          </li>
+          <li>
+            <p><strong>We reply with prices and availability.</strong> Then you decide what to order.</p>
+          </li>
+        </ol>
+      </div>
+      <div data-reveal style="--reveal-delay:80ms">
+        <QuotePreview />
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section contact-band" aria-labelledby="visit-title">
+    <div class="container contact-band__grid" data-reveal>
+      <div>
+        <h2 id="visit-title">Visit, call or message</h2>
+        <address class="contact-band__address">
+          {address.lines.map((l) => <span>{l}</span>)}
+        </address>
+        <a class="link-arrow" href={address.mapsUrl} target="_blank" rel="noopener">
+          <span class="link-arrow__text">Open in Google Maps</span><span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <ul class="contact-band__list">
+        {
+          phones.map((p) => (
+            <li>
+              <span>{p.label}</span>
+              <a href={p.href}>{p.display}</a>
+            </li>
+          ))
+        }
+        {
+          emails.map((e) => (
+            <li>
+              <span>Email</span>
+              <a href={`mailto:${e}`}>{e}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------------------------------------------------------------- hero */
+  .hero {
+    overflow: hidden;
+  }
+  .hero__grid {
+    display: grid;
+    gap: var(--s-7);
+    padding-block: var(--s-7) var(--s-8);
+  }
+  @media (min-width: 1024px) {
+    .hero__grid {
+      grid-template-columns: 7fr 5fr;
+      align-items: center;
+      min-height: min(78vh, 720px);
+      padding-block: var(--s-8) var(--s-9);
+    }
+  }
+  .hero h1 {
+    max-width: 13ch;
+  }
+  .hero .lead {
+    margin-top: var(--s-5);
+    color: #e6e7f5;
+  }
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+  }
+  @media (max-width: 479px) {
+    .hero__actions .btn {
+      flex: 1 1 100%;
+    }
+  }
+  .hero__call {
+    margin-top: var(--s-4);
+    color: var(--on-indigo-muted);
+  }
+  .hero__call a {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .hero__visual {
+    position: relative;
+    width: min(100%, 440px);
+    aspect-ratio: 1;
+    margin-inline: auto;
+  }
+  @media (max-width: 1023px) {
+    .hero__visual {
+      width: min(86vw, 400px);
+    }
+  }
+  .hero__visual :global(.hero__mark) {
+    position: absolute;
+    width: 38%;
+    height: auto;
+    left: 0;
+    top: 2%;
+  }
+
+  .lens--a {
+    position: absolute;
+    width: 62%;
+    right: 0;
+    top: 12%;
+  }
+  .lens--b {
+    position: absolute;
+    width: 40%;
+    left: 6%;
+    bottom: 4%;
+  }
+  .lens--c {
+    position: absolute;
+    width: 30%;
+    right: 8%;
+    bottom: 0;
+  }
+  .lens--c :global(img) {
+    object-fit: contain;
+    padding: 8%;
+  }
+
+  /* ---------------------------------------------------------- departments */
+  .depts__head {
+    display: grid;
+    gap: var(--s-4);
+    margin-bottom: var(--s-7);
+  }
+  @media (min-width: 1024px) {
+    .depts__head {
+      grid-template-columns: 5fr 7fr;
+      align-items: end;
+    }
+  }
+  .depts__head .lead {
+    color: var(--muted);
+  }
+  .depts__ui {
+    display: grid;
+    gap: var(--s-6);
+  }
+  @media (min-width: 1024px) {
+    .depts__ui {
+      grid-template-columns: 5fr 7fr;
+      gap: var(--s-8);
+    }
+  }
+  .depts__tabs {
+    display: flex;
+    gap: var(--s-2);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 2px var(--gutter) var(--s-2);
+    scrollbar-width: none;
+  }
+  .depts__tabs::-webkit-scrollbar {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .depts__tabs {
+      flex-direction: column;
+      gap: 0;
+      overflow: visible;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--border);
+    }
+  }
+  .dept-tab {
+    scroll-snap-align: start;
+    flex: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    min-height: 48px;
+    padding: var(--s-2) var(--s-4);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--surface);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-1) var(--ease-out),
+      color var(--dur-1) var(--ease-out),
+      border-color var(--dur-1) var(--ease-out);
+  }
+  .dept-tab__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.375rem;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  .dept-tab__count {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .dept-tab[aria-selected='true'] {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: #fff;
+  }
+  .dept-tab[aria-selected='true'] .dept-tab__count {
+    color: var(--on-indigo-muted);
+  }
+  @media (min-width: 1024px) {
+    .dept-tab {
+      border: 0;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      background: transparent;
+      padding: var(--s-4) var(--s-2);
+      position: relative;
+    }
+    .dept-tab__name {
+      font-size: 2rem;
+      white-space: normal;
+    }
+    .dept-tab::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: -1px;
+      height: 1px;
+      width: 100%;
+      background: var(--indigo);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--dur-3) var(--ease-out);
+    }
+    .dept-tab:hover .dept-tab__name {
+      color: var(--indigo);
+    }
+    .dept-tab[aria-selected='true'] {
+      background: transparent;
+      color: var(--navy);
+      padding-left: var(--s-5);
+    }
+    .dept-tab[aria-selected='true']::before {
+      transform: scaleX(1);
+      height: 2px;
+    }
+    .dept-tab[aria-selected='true'] .dept-tab__count {
+      color: var(--muted);
+    }
+  }
+
+  .depts__stage {
+    position: relative;
+  }
+  .dept-panel {
+    display: grid;
+    gap: var(--s-6);
+    align-items: center;
+  }
+  @media (min-width: 640px) {
+    .dept-panel {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .dept-panel__lens {
+    width: min(100%, 380px);
+    margin-inline: auto;
+  }
+  .dept-panel__lens :global(img) {
+    object-fit: contain;
+    padding: 10%;
+  }
+  .dept-panel__summary {
+    color: var(--muted);
+  }
+  .dept-panel__list {
+    list-style: none;
+    margin: var(--s-4) 0 var(--s-5);
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .dept-panel__list a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .dept-panel__list a::after {
+    content: '→';
+    color: var(--muted);
+    transition: transform var(--dur-1) var(--ease-out);
+  }
+  .dept-panel__list a:hover::after {
+    transform: translateX(4px);
+    color: var(--navy);
+  }
+
+  /* ---------------------------------------------------------------- lab */
+  .lab {
+    display: grid;
+  }
+  @media (min-width: 1024px) {
+    .lab {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .lab__photo {
+    background: #fff;
+    min-height: 320px;
+  }
+  .lab__photo :global(img) {
+    width: 100%;
+    height: 100%;
+    max-height: 760px;
+    object-fit: cover;
+  }
+  .lab__body {
+    padding: var(--s-8) var(--gutter);
+  }
+  @media (min-width: 1024px) {
+    .lab__body {
+      padding: var(--s-9) var(--s-8);
+      display: flex;
+      align-items: center;
+    }
+  }
+  .lab__inner {
+    max-width: 560px;
+    display: grid;
+    gap: var(--s-5);
+    justify-items: start;
+  }
+  .lab .lead {
+    color: #e6e7f5;
+  }
+  .lab__lists {
+    display: grid;
+    gap: var(--s-5);
+    width: 100%;
+  }
+  @media (min-width: 640px) {
+    .lab__lists {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .lab__group h3 {
+    font-size: 1.5rem;
+    padding-bottom: var(--s-2);
+    border-bottom: 1px solid rgb(255 255 255 / 0.2);
+    margin-bottom: var(--s-2);
+  }
+  .lab__group h3 span {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--on-indigo-muted);
+  }
+  .lab__group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+    font-size: 0.9375rem;
+  }
+  .lab__more {
+    color: var(--on-indigo-muted);
+  }
+
+  /* ------------------------------------------------------------ sterile */
+  .sterile__grid {
+    display: grid;
+    gap: var(--s-7);
+  }
+  @media (min-width: 1024px) {
+    .sterile__grid {
+      grid-template-columns: 4fr 8fr;
+      align-items: center;
+      gap: var(--s-8);
+    }
+  }
+  .sterile__text .lead {
+    color: var(--muted);
+    margin: var(--s-4) 0 var(--s-4);
+  }
+  .flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-4);
+    counter-reset: flow;
+  }
+  @media (min-width: 768px) {
+    .flow {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  .flow__station {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: var(--s-3);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+  }
+  .flow__station:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: calc(var(--s-4) * -1);
+    width: var(--s-4);
+    height: 1px;
+    background: var(--border-strong);
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .flow__station:not(:last-child)::after {
+      display: block;
+    }
+  }
+  .flow__img {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    margin-bottom: var(--s-2);
+  }
+  .flow__img :global(img) {
+    max-height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+  .flow__step {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--indigo);
+  }
+  .flow__name {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  /* -------------------------------------------------------------- order */
+  .order {
+    background: var(--surface);
+    border-block: 1px solid var(--border);
+  }
+  .order__grid {
+    display: grid;
+    gap: var(--s-7);
+  }
+  @media (min-width: 1024px) {
+    .order__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--s-8);
+      align-items: start;
+    }
+  }
+  .order__steps {
+    margin: var(--s-6) 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+    display: grid;
+    gap: var(--s-5);
+  }
+  .order__steps li {
+    counter-increment: step;
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: var(--s-3);
+    color: var(--muted);
+  }
+  .order__steps li::before {
+    content: counter(step);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--indigo);
+  }
+  .order__steps strong {
+    color: var(--text);
+    font-weight: 600;
+    display: block;
+  }
+
+  /* ------------------------------------------------------------ contact */
+  .contact-band__grid {
+    display: grid;
+    gap: var(--s-6);
+  }
+  @media (min-width: 768px) {
+    .contact-band__grid {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+    }
+  }
+  .contact-band__address {
+    font-style: normal;
+    display: grid;
+    font-size: var(--fs-lead);
+    margin: var(--s-4) 0 var(--s-2);
+  }
+  .contact-band__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .contact-band__list li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-4);
+    flex-wrap: wrap;
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .contact-band__list span {
+    color: var(--muted);
+  }
+  .contact-band__list a {
+    font-weight: 600;
+    color: var(--navy);
+    word-break: break-word;
+  }
+</style>
+
+<script>
+  import '../scripts/hero-mark'
+  import '../scripts/dept-selector'
+</script>

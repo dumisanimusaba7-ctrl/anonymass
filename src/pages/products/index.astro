@@ -1,0 +1,196 @@
+---
+import Base from '../../layouts/Base.astro'
+import Breadcrumbs from '../../components/Breadcrumbs.astro'
+import Plate from '../../components/Plate.astro'
+import { allCategories, categoryCount, departments } from '../../data/catalogue'
+import { whatsappLink } from '../../data/site'
+---
+
+<Base
+  title="Products | Optima Medical Supplies, Kitwe"
+  description={`All ${categoryCount} product categories from Optima: diagnostics, theatre, wards, sterile services, consumables and laboratory ware. Filter, search and build a quote list.`}
+>
+  <section class="cat-head">
+    <div class="container">
+      <Breadcrumbs trail={[{ href: '/', label: 'Home' }, { label: 'Products' }]} />
+      <h1>Products</h1>
+      <p class="lead">
+        All {categoryCount} categories from the 2024 company profile. Filter by department or search, then add what you need
+        to your quote list.
+      </p>
+
+      <div class="cat-controls" data-filter-controls>
+        <label class="search">
+          <span class="visually-hidden">Search products</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+          <input type="search" placeholder="Search, e.g. gloves, autoclave, pipettes" autocomplete="off" data-search />
+        </label>
+        <div class="chips" role="group" aria-label="Filter by department">
+          <button type="button" class="chip" aria-pressed="true" data-dept="">All</button>
+          {
+            departments.map((d) => (
+              <button type="button" class="chip" aria-pressed="false" data-dept={d.slug}>
+                {d.short}
+              </button>
+            ))
+          }
+        </div>
+        <p class="cat-status" role="status" data-status>Showing all {categoryCount} categories</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section cat-grid-wrap" aria-label="Product categories">
+    <div class="container">
+      <div class="cat-grid" data-filter-grid>
+        {
+          allCategories.map((c, i) => (
+            <div
+              class="cat-grid__cell"
+              data-filter-item
+              data-dept={c.department.slug}
+              data-text={[c.name, c.shown, c.department.name, ...(c.items ?? [])].join(' ').toLowerCase()}
+            >
+              <Plate category={c} department={c.department} eager={i < 3} showDepartment />
+            </div>
+          ))
+        }
+      </div>
+      <div class="cat-empty" data-empty hidden>
+        <h2>Nothing matches “<span data-empty-term></span>”</h2>
+        <p class="lead">Try a shorter word. Or ask us directly: we can tell you if we can supply it.</p>
+        <a class="btn" href={whatsappLink()} data-empty-ask>Ask on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .cat-head {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding-block: var(--s-6) var(--s-5);
+  }
+  .cat-head h1 {
+    color: var(--navy);
+  }
+  .cat-head .lead {
+    color: var(--muted);
+    margin-top: var(--s-3);
+  }
+  .cat-controls {
+    display: grid;
+    gap: var(--s-4);
+    margin-top: var(--s-6);
+  }
+  .search {
+    position: relative;
+    display: block;
+    max-width: 560px;
+  }
+  .search svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translateY(-50%);
+    fill: none;
+    stroke: var(--muted);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  .search input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 var(--s-4) 0 44px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    background: var(--surface);
+    font-size: 1rem;
+  }
+  .search input:focus {
+    outline: 2px solid var(--focus);
+    outline-offset: 1px;
+    border-color: var(--navy);
+  }
+  .chips {
+    display: flex;
+    gap: var(--s-2);
+    overflow-x: auto;
+    margin-inline: calc(var(--gutter) * -1);
+    padding: 2px var(--gutter);
+    scrollbar-width: none;
+  }
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .chips {
+      flex-wrap: wrap;
+      overflow: visible;
+      margin: 0;
+      padding: 0;
+    }
+  }
+  .chip {
+    flex: none;
+    min-height: 44px;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    background: var(--surface);
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-1) var(--ease-out),
+      color var(--dur-1) var(--ease-out),
+      border-color var(--dur-1) var(--ease-out);
+  }
+  .chip:hover {
+    border-color: var(--indigo);
+  }
+  .chip[aria-pressed='true'] {
+    background: var(--indigo);
+    border-color: var(--indigo);
+    color: #fff;
+  }
+  .cat-status {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .cat-grid {
+    display: grid;
+    gap: var(--s-5);
+  }
+  @media (min-width: 640px) {
+    .cat-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .cat-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .cat-grid__cell {
+    display: grid;
+  }
+  .cat-empty {
+    display: grid;
+    gap: var(--s-4);
+    justify-items: start;
+    padding-block: var(--s-6);
+  }
+  .cat-empty h2 {
+    font-size: 2.25rem;
+  }
+  .cat-empty .lead {
+    color: var(--muted);
+  }
+</style>
+
+<script>
+  import '../../scripts/catalogue-filter'
+</script>

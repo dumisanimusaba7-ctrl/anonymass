@@ -1,0 +1,484 @@
+---
+import Base from '../layouts/Base.astro'
+import Breadcrumbs from '../components/Breadcrumbs.astro'
+import { departments } from '../data/catalogue'
+import { emails, whatsapp } from '../data/site'
+---
+
+<Base
+  title="Your quote list | Optima Medical Supplies"
+  description="Review the products on your quote list, set quantities and send the list to Optima on WhatsApp or by email."
+  noindex
+>
+  <section class="quote">
+    <div class="container">
+      <Breadcrumbs trail={[{ href: '/', label: 'Home' }, { label: 'Quote list' }]} />
+      <div class="quote__head">
+        <h1>Your quote list</h1>
+        <p class="quote__count"><span data-quote-count data-count="0">0</span> items</p>
+      </div>
+
+      <div class="quote__empty" data-empty hidden>
+        <p class="lead">Your list is empty. Add products from any department and they appear here.</p>
+        <ul class="quote__depts">
+          {
+            departments.map((d) => (
+              <li>
+                <a class="link-arrow" href={`/products/${d.slug}`}>
+                  <span class="link-arrow__text">{d.name}</span>
+                  <span aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="quote__grid" data-filled hidden>
+        <div>
+          <ul class="qlist" data-list aria-label="Items on your quote list"></ul>
+          <button type="button" class="qlist__clear" data-clear>Clear the whole list</button>
+        </div>
+
+        <form class="qsend" data-send novalidate>
+          <h2>Send your list</h2>
+          <p class="qsend__intro">
+            We only use these details to reply to your request. They stay in this browser until you send the list.
+          </p>
+          <div class="field">
+            <label for="q-name">Your name</label>
+            <input id="q-name" name="name" autocomplete="name" required aria-describedby="q-name-err" />
+            <p class="field__error" id="q-name-err" hidden>Add your name so we know who the quote is for.</p>
+          </div>
+          <div class="field">
+            <label for="q-facility">Hospital, clinic or company <span>Optional</span></label>
+            <input id="q-facility" name="facility" autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="q-town">Town <span>Optional</span></label>
+            <input id="q-town" name="town" autocomplete="address-level2" />
+          </div>
+          <div class="field">
+            <label for="q-phone">Phone number <span>Optional</span></label>
+            <input id="q-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+          </div>
+          <div class="field">
+            <label for="q-message">Anything else? <span>Optional</span></label>
+            <textarea id="q-message" name="message" rows="3" placeholder="Delivery date, budget, items not on the site"></textarea>
+          </div>
+          <div class="qsend__actions">
+            <button class="btn" type="submit" value="whatsapp">Send on WhatsApp</button>
+            <button class="btn btn--outline" type="submit" value="email">Send by email</button>
+          </div>
+          <div class="qsend__more">
+            <button type="button" class="qsend__small" data-copy>Copy list</button>
+            <button type="button" class="qsend__small" data-print>Print</button>
+          </div>
+          <p class="qsend__done" role="status" data-done hidden></p>
+          <details class="qsend__preview">
+            <summary>See the message we will send</summary>
+            <pre data-preview></pre>
+          </details>
+          <p class="qsend__to">
+            WhatsApp goes to {whatsapp.display}. Email goes to {emails[0]}.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .quote {
+    padding-block: var(--s-6) var(--s-9);
+  }
+  .quote__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-6);
+  }
+  .quote h1 {
+    color: var(--navy);
+  }
+  .quote__count {
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .quote__empty .lead {
+    color: var(--muted);
+  }
+  .quote__depts {
+    list-style: none;
+    padding: 0;
+    margin: var(--s-5) 0 0;
+    display: grid;
+    gap: var(--s-1);
+  }
+  .quote__grid {
+    display: grid;
+    gap: var(--s-7);
+  }
+  @media (min-width: 1024px) {
+    .quote__grid {
+      grid-template-columns: 7fr 5fr;
+      align-items: start;
+    }
+  }
+
+  .qlist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .qlist :global(.qrow) {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-3) var(--s-4);
+    padding: var(--s-4) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .qlist :global(.qrow__name) {
+    font-weight: 600;
+  }
+  .qlist :global(.qrow__group) {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .qlist :global(.qrow__controls) {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    align-items: center;
+  }
+  .qlist :global(.stepper) {
+    display: inline-flex;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .qlist :global(.stepper button) {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--navy);
+  }
+  .qlist :global(.stepper button:hover) {
+    background: var(--sky-100);
+  }
+  .qlist :global(.stepper input) {
+    width: 56px;
+    height: 44px;
+    border: 0;
+    border-inline: 1px solid var(--border);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    -moz-appearance: textfield;
+  }
+  .qlist :global(.stepper input::-webkit-inner-spin-button) {
+    -webkit-appearance: none;
+  }
+  .qlist :global(.qrow__note) {
+    flex: 1 1 220px;
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--surface);
+    font-size: 0.9375rem;
+  }
+  .qlist :global(.qrow__remove) {
+    align-self: start;
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    border: 0;
+    background: none;
+    color: var(--error);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .qlist__clear {
+    margin-top: var(--s-4);
+    min-height: 44px;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .qsend {
+    display: grid;
+    gap: var(--s-5);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    padding: var(--s-5);
+  }
+  @media (min-width: 1024px) {
+    .qsend {
+      position: sticky;
+      top: calc(var(--header-h) + var(--s-5));
+    }
+  }
+  .qsend h2 {
+    font-size: 2.25rem;
+  }
+  .qsend__intro,
+  .qsend__to {
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+  .qsend__intro {
+    margin-top: calc(var(--s-3) * -1);
+  }
+  .qsend__actions,
+  .qsend__more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+  .qsend__small {
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .qsend__small:hover {
+    border-color: var(--navy);
+  }
+  .qsend__done {
+    padding: var(--s-3) var(--s-4);
+    border-radius: var(--r-2);
+    background: var(--sky-100);
+    color: var(--navy);
+  }
+  .qsend__preview summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--navy);
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  .qsend__preview pre {
+    white-space: pre-wrap;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    background: var(--bg);
+    padding: var(--s-4);
+    border-radius: var(--r-2);
+    margin: 0;
+  }
+
+  @media print {
+    .qsend,
+    .qlist__clear,
+    .qlist :global(.qrow__remove),
+    .qlist :global(.stepper button) {
+      display: none !important;
+    }
+    .quote__grid {
+      display: block !important;
+    }
+  }
+</style>
+
+<script>
+  import { quote, type QuoteItem } from '../scripts/quote-store'
+  import { formatQuote, type Details } from '../scripts/quote-format'
+  import { onPage, reducedMotion } from '../scripts/motion'
+  import { mailLink, whatsappLink } from '../data/site'
+
+  onPage(() => {
+    const listEl = document.querySelector<HTMLElement>('[data-list]')
+    if (!listEl) return
+    const list = listEl
+    const form = document.querySelector<HTMLFormElement>('[data-send]')!
+    const emptyEl = document.querySelector<HTMLElement>('[data-empty]')!
+    const filled = document.querySelector<HTMLElement>('[data-filled]')!
+    const preview = form.querySelector<HTMLElement>('[data-preview]')!
+    const done = form.querySelector<HTMLElement>('[data-done]')!
+    const DETAILS_KEY = 'optima-quote-details'
+
+    // Remember contact details on this device so a second list is quicker.
+    try {
+      const saved = JSON.parse(localStorage.getItem(DETAILS_KEY) ?? '{}') as Details
+      for (const [k, v] of Object.entries(saved)) {
+        const el = form.elements.namedItem(k) as HTMLInputElement | null
+        if (el && typeof v === 'string' && k !== 'message') el.value = v
+      }
+    } catch {
+      /* ignore */
+    }
+
+    const details = (): Details => {
+      const v = (n: string) => (form.elements.namedItem(n) as HTMLInputElement).value
+      return { name: v('name'), facility: v('facility'), town: v('town'), phone: v('phone'), message: v('message') }
+    }
+    const updatePreview = () => (preview.textContent = formatQuote(quote.all(), details()))
+
+    function row(item: QuoteItem) {
+      const li = document.createElement('li')
+      li.className = 'qrow'
+      li.dataset.id = item.id
+      li.innerHTML = `
+        <div class="qrow__name"></div>
+        <button type="button" class="qrow__remove">Remove</button>
+        <div class="qrow__controls">
+          <div class="stepper">
+            <button type="button" data-step="-1" aria-label="Fewer">−</button>
+            <input type="number" min="1" max="9999" inputmode="numeric" aria-label="Quantity">
+            <button type="button" data-step="1" aria-label="More">+</button>
+          </div>
+          <input class="qrow__note" type="text" placeholder="Size, model or brand (optional)" aria-label="Note">
+        </div>`
+      const name = li.querySelector<HTMLElement>('.qrow__name')!
+      name.textContent = item.name
+      const group = document.createElement('span')
+      group.className = 'qrow__group'
+      group.textContent = item.group
+      name.append(group)
+      li.querySelector<HTMLButtonElement>('.qrow__remove')!.setAttribute('aria-label', `Remove ${item.name}`)
+      const qty = li.querySelector<HTMLInputElement>('.stepper input')!
+      qty.value = String(item.qty)
+      qty.setAttribute('aria-label', `Quantity of ${item.name}`)
+      const note = li.querySelector<HTMLInputElement>('.qrow__note')!
+      note.value = item.note
+      note.setAttribute('aria-label', `Note for ${item.name}`)
+      return li
+    }
+
+    function render() {
+      const items = quote.all()
+      emptyEl.hidden = items.length > 0
+      filled.hidden = items.length === 0
+      const existing = new Map([...list.children].map((li) => [(li as HTMLElement).dataset.id!, li as HTMLElement]))
+      // Only touch the DOM when items were added or removed, so typing in a
+      // note or quantity never loses focus.
+      const same = items.map((i) => i.id).join('|') === [...existing.keys()].join('|')
+      if (!same) list.replaceChildren(...items.map((item) => existing.get(item.id) ?? row(item)))
+      updatePreview()
+    }
+
+    const onListClick = (e: Event) => {
+      const t = e.target as HTMLElement
+      const li = t.closest<HTMLElement>('.qrow')
+      if (!li) return
+      const id = li.dataset.id!
+      if (t.closest('.qrow__remove')) {
+        const go = () => quote.remove(id)
+        if (reducedMotion()) return go()
+        const h = li.offsetHeight
+        li.animate(
+          [
+            { opacity: 1, height: `${h}px`, transform: 'none' },
+            { opacity: 0, height: '0px', paddingBlock: '0px', transform: 'translateX(24px)' },
+          ],
+          { duration: 280, easing: 'cubic-bezier(.4,0,1,1)' },
+        ).finished.then(go)
+        return
+      }
+      const step = t.closest<HTMLElement>('[data-step]')
+      if (step) {
+        const input = li.querySelector<HTMLInputElement>('.stepper input')!
+        const value = Math.min(9999, Math.max(1, (Number(input.value) || 1) + Number(step.dataset.step)))
+        input.value = String(value)
+        quote.update(id, { qty: value })
+      }
+    }
+    const onListInput = (e: Event) => {
+      const t = e.target as HTMLInputElement
+      const li = t.closest<HTMLElement>('.qrow')
+      if (!li) return
+      if (t.matches('.stepper input')) {
+        const value = Math.min(9999, Math.max(1, Math.round(Number(t.value)) || 1))
+        if (e.type === 'change') t.value = String(value)
+        quote.update(li.dataset.id!, { qty: value })
+      } else if (t.matches('.qrow__note')) quote.update(li.dataset.id!, { note: t.value })
+    }
+
+    const check = (input: HTMLInputElement) => {
+      const ok = input.value.trim() !== ''
+      input.setAttribute('aria-invalid', String(!ok))
+      document.getElementById(`${input.id}-err`)?.toggleAttribute('hidden', ok)
+      return ok
+    }
+
+    const onSubmit = (e: SubmitEvent) => {
+      e.preventDefault()
+      const name = form.elements.namedItem('name') as HTMLInputElement
+      if (!check(name)) {
+        name.focus()
+        return
+      }
+      const d = details()
+      try {
+        localStorage.setItem(DETAILS_KEY, JSON.stringify({ ...d, message: '' }))
+      } catch {
+        /* ignore */
+      }
+      const text = formatQuote(quote.all(), d)
+      const via = (e.submitter as HTMLButtonElement | null)?.value === 'email' ? 'email' : 'whatsapp'
+      if (via === 'email') location.href = mailLink(`Quote request from ${d.name?.trim()}`, text)
+      else window.open(whatsappLink(text), '_blank', 'noopener')
+      done.hidden = false
+      done.textContent =
+        via === 'email'
+          ? 'Your email app should now be open with the list. Press send there. Your list stays here until you clear it.'
+          : 'WhatsApp should now be open with your list. Press send there. Your list stays here until you clear it.'
+    }
+
+    const onCopy = async () => {
+      try {
+        await navigator.clipboard.writeText(formatQuote(quote.all(), details()))
+        done.hidden = false
+        done.textContent = 'List copied. Paste it into any message or email.'
+      } catch {
+        done.hidden = false
+        done.textContent = 'Could not copy automatically. Open “See the message we will send” and copy it from there.'
+      }
+    }
+    const onClear = () => {
+      if (confirm('Remove every item from your quote list?')) quote.clear()
+    }
+
+    list.addEventListener('click', onListClick)
+    list.addEventListener('input', onListInput)
+    list.addEventListener('change', onListInput)
+    form.addEventListener('submit', onSubmit)
+    form.addEventListener('input', updatePreview)
+    form.querySelector('[data-copy]')!.addEventListener('click', onCopy)
+    form.querySelector('[data-print]')!.addEventListener('click', () => window.print())
+    document.querySelector('[data-clear]')!.addEventListener('click', onClear)
+    const off = quote.onChange(render)
+    render()
+
+    return () => {
+      off()
+      list.removeEventListener('click', onListClick)
+      list.removeEventListener('input', onListInput)
+      list.removeEventListener('change', onListInput)
+      form.removeEventListener('submit', onSubmit)
+      form.removeEventListener('input', updatePreview)
+    }
+  })
+</script>

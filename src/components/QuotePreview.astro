@@ -1,0 +1,123 @@
+---
+// A live, compact view of the visitor's own quote list. It shows whatever is
+// on the list right now, so items added further up the page appear here.
+import { whatsappLink } from '../data/site'
+---
+
+<div class="qp" data-quote-preview>
+  <div class="qp__head">
+    <span class="qp__title">Your quote list</span>
+    <span class="qp__count"><span data-quote-count data-count="0">0</span> items</span>
+  </div>
+  <ul class="qp__list" data-qp-list></ul>
+  <p class="qp__empty" data-qp-empty>
+    Nothing on your list yet. Use <strong>Add to quote</strong> on any product and it appears here.
+  </p>
+  <div class="qp__actions">
+    <a class="btn" href={whatsappLink()} data-qp-whatsapp aria-disabled="true">Send on WhatsApp</a>
+    <a class="btn btn--outline" href="/quote">Edit list</a>
+  </div>
+</div>
+
+<style>
+  .qp {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    padding: var(--s-5);
+  }
+  .qp__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .qp__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+  .qp__count {
+    color: var(--muted);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+  }
+  .qp__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .qp__list :global(li) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--border);
+    animation: qp-in var(--dur-2) var(--ease-out);
+  }
+  .qp__list :global(.qp__group) {
+    color: var(--muted);
+    font-size: var(--fs-small);
+    text-align: right;
+  }
+  @keyframes qp-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  .qp__empty {
+    padding: var(--s-5) 0;
+    color: var(--muted);
+  }
+  .qp__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-5);
+  }
+  .qp__actions [aria-disabled='true'] {
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { quote } from '../scripts/quote-store'
+  import { formatQuote } from '../scripts/quote-format'
+  import { onPage } from '../scripts/motion'
+  import { whatsappLink } from '../data/site'
+
+  function render(root: HTMLElement, animate: boolean) {
+    const items = quote.all()
+    const list = root.querySelector<HTMLElement>('[data-qp-list]')!
+    const empty = root.querySelector<HTMLElement>('[data-qp-empty]')!
+    const wa = root.querySelector<HTMLAnchorElement>('[data-qp-whatsapp]')!
+    const shown = new Set([...list.children].map((li) => (li as HTMLElement).dataset.id))
+    list.replaceChildren(
+      ...items.slice(-6).map((item) => {
+        const li = document.createElement('li')
+        li.dataset.id = item.id
+        if (!animate || shown.has(item.id)) li.style.animation = 'none'
+        const name = document.createElement('span')
+        name.textContent = `${item.qty} × ${item.name}`
+        const group = document.createElement('span')
+        group.className = 'qp__group'
+        group.textContent = item.group
+        li.append(name, group)
+        return li
+      }),
+    )
+    empty.hidden = items.length > 0
+    wa.setAttribute('aria-disabled', String(items.length === 0))
+    wa.href = whatsappLink(items.length ? formatQuote(items) : undefined)
+  }
+
+  onPage(() => {
+    const root = document.querySelector<HTMLElement>('[data-quote-preview]')
+    if (!root) return
+    render(root, false)
+    return quote.onChange(() => render(root, true))
+  })
+</script>

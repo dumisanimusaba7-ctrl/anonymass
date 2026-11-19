@@ -1,0 +1,163 @@
+---
+import Mark from './Mark.astro'
+import { departments } from '../data/catalogue'
+import { address, company, emails, fax, phones } from '../data/site'
+const year = new Date().getFullYear()
+interface Props {
+  /** Colour of the section the wave sits under. */
+  waveOn?: 'light' | 'indigo'
+}
+const { waveOn = 'light' } = Astro.props
+---
+
+<footer class="site-footer on-indigo">
+  <!-- The red wave from the company profile cover, used once. -->
+  <svg class="site-footer__wave" viewBox="0 0 1440 56" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    <path d="M0 18 C 360 58, 760 -6, 1440 30 L1440 0 L0 0 Z" fill={waveOn === 'indigo' ? 'var(--indigo-800)' : 'var(--bg)'}></path>
+    <path d="M0 18 C 360 58, 760 -6, 1440 30" fill="none" stroke="var(--ice)" stroke-width="14"></path>
+    <path d="M0 18 C 360 58, 760 -6, 1440 30" fill="none" stroke="var(--wave-red)" stroke-width="6"></path>
+  </svg>
+
+  <div class="container site-footer__grid">
+    <div class="site-footer__brand">
+      <a class="footer-brand" href="/">
+        <Mark size={44} />
+        <span>{company.legalName}</span>
+      </a>
+      <p>Medical equipment, hospital furniture, consumables and laboratory ware, supplied from Kitwe.</p>
+    </div>
+
+    <nav aria-label="Departments">
+      <h2 class="site-footer__heading">Departments</h2>
+      <ul>
+        {
+          departments.map((d) => (
+            <li>
+              <a href={`/products/${d.slug}`}>{d.name}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav aria-label="Company">
+      <h2 class="site-footer__heading">Company</h2>
+      <ul>
+        <li><a href="/products">All products</a></li>
+        <li><a href="/sterile-services">Sterile services</a></li>
+        <li><a href="/about">About Optima</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/quote">Quote list</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="site-footer__heading">Find us</h2>
+      <address>
+        {address.lines.map((l) => <span>{l}</span>)}
+      </address>
+      <ul class="site-footer__contact">
+        {phones.map((p) => <li><a href={p.href}>{p.display}</a></li>)}
+        <li>Fax {fax.display}</li>
+        {emails.map((e) => <li><a href={`mailto:${e}`}>{e}</a></li>)}
+      </ul>
+    </div>
+  </div>
+
+  <div class="container site-footer__base">
+    <p>© {year} {company.legalName}</p>
+    <p>No cookies or tracking. Your quote list stays in this browser until you send it.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    margin-top: 0;
+    padding-bottom: calc(var(--s-6) + var(--mobile-bar-h, 0px));
+  }
+  .site-footer__wave {
+    display: block;
+    width: 100%;
+    height: 40px;
+  }
+  .site-footer__grid {
+    display: grid;
+    gap: var(--s-7) var(--s-6);
+    padding-block: var(--s-7) var(--s-7);
+  }
+  @media (min-width: 768px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 1024px) {
+    .site-footer__grid {
+      grid-template-columns: 1.4fr 1.2fr 0.8fr 1.1fr;
+    }
+  }
+  .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    line-height: 1.05;
+    text-decoration: none;
+    max-width: 24ch;
+  }
+  .site-footer__brand p {
+    margin-top: var(--s-4);
+    color: var(--on-indigo-muted);
+    max-width: 32ch;
+  }
+  .site-footer__heading {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--on-indigo-muted);
+    margin-bottom: var(--s-3);
+  }
+  .site-footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .site-footer nav a,
+  .site-footer__contact a {
+    display: inline-block;
+    padding: 6px 0;
+    text-decoration: none;
+  }
+  .site-footer nav a:hover,
+  .site-footer__contact a:hover {
+    text-decoration: underline;
+  }
+  address {
+    font-style: normal;
+    display: grid;
+    margin-bottom: var(--s-3);
+  }
+  .site-footer__contact li {
+    color: var(--on-indigo-muted);
+    word-break: break-word;
+  }
+  .site-footer__contact a {
+    color: #fff;
+  }
+  .site-footer__base {
+    display: grid;
+    gap: var(--s-2);
+    padding-top: var(--s-5);
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+    font-size: var(--fs-small);
+    color: var(--on-indigo-muted);
+  }
+  @media (min-width: 768px) {
+    .site-footer__base {
+      grid-template-columns: auto 1fr;
+      justify-items: end;
+    }
+  }
+</style>

@@ -1,0 +1,258 @@
+---
+import { Image } from 'astro:assets'
+import Base from '../../layouts/Base.astro'
+import Breadcrumbs from '../../components/Breadcrumbs.astro'
+import Plate from '../../components/Plate.astro'
+import LabList from '../../components/LabList.astro'
+import { departments, type Department } from '../../data/catalogue'
+import { whatsappLink } from '../../data/site'
+
+export function getStaticPaths() {
+  return departments.map((department, i) => ({
+    params: { department: department.slug },
+    props: {
+      department,
+      next: departments[(i + 1) % departments.length],
+      prev: departments[(i - 1 + departments.length) % departments.length],
+    },
+  }))
+}
+
+interface Props {
+  department: Department
+  next: Department
+  prev: Department
+}
+const { department: d, next, prev } = Astro.props
+const isLab = d.categories.every((c) => c.items)
+const itemTotal = d.categories.reduce((n, c) => n + (c.items?.length ?? 0), 0)
+---
+
+<Base
+  title={`${d.name} | Optima Medical Supplies, Kitwe`}
+  description={`${d.summary} Supplied by Optima Industrial Solutions in Kitwe, Zambia. Add what you need to a quote list and send it on WhatsApp or email.`}
+>
+  <section class="dept-hero">
+    <div class="container dept-hero__grid">
+      <div class="dept-hero__text">
+        <Breadcrumbs trail={[{ href: '/', label: 'Home' }, { href: '/products', label: 'Products' }, { label: d.short }]} />
+        <h1 transition:name={`dept-title-${d.slug}`}>{d.name}</h1>
+        <p class="lead">{d.intro}</p>
+        <p class="dept-hero__meta">
+          {d.categories.length} categories{isLab && `, ${itemTotal} items`} · from the 2024 company profile
+        </p>
+      </div>
+      <div class="lens dept-hero__lens" transition:name={`dept-img-${d.slug}`}>
+        <Image
+          src={d.image}
+          alt={d.alt}
+          widths={[320, 480, Math.min(640, d.image.width)].filter((w) => w <= d.image.width)}
+          sizes="(min-width: 1024px) 380px, 70vw"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section dept-body" aria-label={`${d.name} categories`}>
+    <div class="container">
+      {
+        isLab ? (
+          <div class="lab-grid">
+            <p class="lab-grid__hint" data-reveal>
+              Tick every item you need. Ticked items go straight onto your quote list, where you can set quantities.
+            </p>
+            {d.categories.map((c) => (
+              <div data-reveal>
+                <LabList category={c} group={d.name} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="plates">
+            {d.categories.map((c, i) => (
+              <div class:list={['plates__cell', i === 0 && 'plates__cell--lead']} data-reveal style={`--reveal-delay:${(i % 3) * 60}ms`}>
+                <Plate category={c} department={d} headingLevel="h2" eager={i < 2} />
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section ask" aria-labelledby="ask-title">
+    <div class="container ask__grid" data-reveal>
+      <div>
+        <h2 id="ask-title">Not on this page?</h2>
+        <p class="lead">
+          Add a note to your quote list, or send us the item name, size and quantity.
+        </p>
+      </div>
+      <div class="ask__actions">
+        <a class="btn" href="/quote">Open my quote list</a>
+        <a class="btn btn--outline" href={whatsappLink(`Hello Optima, I am looking for an item under ${d.name}: `)}>
+          Ask on WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <nav class="container pager" aria-label="Other departments">
+    <a href={`/products/${prev.slug}`} class="pager__link">
+      <span class="pager__dir">Previous department</span>
+      <span class="pager__name">{prev.name}</span>
+    </a>
+    <a href={`/products/${next.slug}`} class="pager__link pager__link--next">
+      <span class="pager__dir">Next department</span>
+      <span class="pager__name">{next.name}</span>
+    </a>
+  </nav>
+</Base>
+
+<style>
+  .dept-hero {
+    padding-block: var(--s-6) var(--s-7);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .dept-hero__grid {
+    display: grid;
+    gap: var(--s-6);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .dept-hero__grid {
+      grid-template-columns: 7fr 5fr;
+      gap: var(--s-8);
+    }
+  }
+  .dept-hero h1 {
+    color: var(--navy);
+    max-width: 12ch;
+  }
+  .dept-hero .lead {
+    margin-top: var(--s-4);
+    color: var(--muted);
+  }
+  .dept-hero__meta {
+    margin-top: var(--s-4);
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+  .dept-hero__lens {
+    width: min(70vw, 380px);
+    margin-inline: auto;
+  }
+  .dept-hero__lens :global(img) {
+    object-fit: contain;
+    padding: 10%;
+  }
+
+  .plates {
+    display: grid;
+    gap: var(--s-5);
+  }
+  @media (min-width: 640px) {
+    .plates {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1024px) {
+    .plates {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    /* The first category gets a wide plate: one deliberate break in the grid. */
+    .plates__cell--lead {
+      grid-column: span 2;
+    }
+    .plates__cell--lead :global(.plate) {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      grid-template-rows: auto 1fr;
+    }
+    .plates__cell--lead :global(.plate__label) {
+      grid-column: 1 / -1;
+    }
+    .plates__cell--lead :global(.plate__well) {
+      border-bottom: 0;
+      border-right: 1px solid var(--border);
+      aspect-ratio: auto;
+      min-height: 320px;
+    }
+    .plates__cell--lead :global(.plate__body) {
+      justify-content: center;
+    }
+  }
+  .plates__cell {
+    display: grid;
+  }
+
+  .lab-grid {
+    display: grid;
+    gap: var(--s-5);
+    max-width: 920px;
+  }
+  .lab-grid__hint {
+    color: var(--muted);
+  }
+
+  .ask {
+    background: var(--surface);
+    border-block: 1px solid var(--border);
+  }
+  .ask__grid {
+    display: grid;
+    gap: var(--s-5);
+  }
+  @media (min-width: 1024px) {
+    .ask__grid {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+  }
+  .ask .lead {
+    color: var(--muted);
+    margin-top: var(--s-3);
+  }
+  .ask__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-4);
+    padding-block: var(--s-7);
+  }
+  .pager__link {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-4);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    background: var(--surface);
+    text-decoration: none;
+    transition: border-color var(--dur-1) var(--ease-out);
+  }
+  .pager__link:hover {
+    border-color: var(--indigo);
+  }
+  .pager__link--next {
+    text-align: right;
+  }
+  .pager__dir {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+  .pager__name {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.375rem;
+    line-height: 1.1;
+    color: var(--navy);
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+// Item-by-item checklist for laboratory categories. Each tick puts that item
+// on the quote list.
+import type { Category } from '../data/catalogue'
+interface Props {
+  category: Category
+  group: string
+}
+const { category, group } = Astro.props
+const slug = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+---
+
+<section class="lablist" id={category.slug} aria-labelledby={`${category.slug}-title`}>
+  <h2 class="plate__label lablist__title" id={`${category.slug}-title`}>
+    {category.name} <span>{category.items!.length} items</span>
+  </h2>
+  <ul class="lablist__items">
+    {
+      category.items!.map((item) => (
+        <li>
+          <label class="tick">
+            <input type="checkbox" data-add-quote data-id={`${category.slug}::${slug(item)}`} data-name={item} data-group={group} />
+            <span class="tick__box" aria-hidden="true">
+              <svg viewBox="0 0 20 20">
+                <path d="M4.5 10.5l3.5 3.5 7.5-8" pathLength="1" />
+              </svg>
+            </span>
+            <span class="tick__text">{item}</span>
+          </label>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .lablist {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-3);
+    overflow: hidden;
+  }
+  .lablist__title span {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    margin-left: var(--s-2);
+  }
+  .lablist__items {
+    list-style: none;
+    margin: 0;
+    padding: var(--s-2) var(--s-4) var(--s-4);
+    columns: 1;
+  }
+  @media (min-width: 640px) {
+    .lablist__items {
+      columns: 2;
+      column-gap: var(--s-6);
+    }
+  }
+  .lablist__items li {
+    break-inside: avoid;
+    border-bottom: 1px solid var(--border);
+  }
+  .tick {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 48px;
+    cursor: pointer;
+  }
+  .tick input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .tick__box {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--r-1);
+    display: grid;
+    place-items: center;
+    background: var(--surface);
+    transition:
+      background-color var(--dur-1) var(--ease-out),
+      border-color var(--dur-1) var(--ease-out);
+  }
+  .tick__box svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tick__box path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset var(--dur-2) var(--ease-out);
+  }
+  .tick:hover .tick__box {
+    border-color: var(--indigo);
+  }
+  .tick input:checked + .tick__box {
+    background: var(--indigo);
+    border-color: var(--indigo);
+  }
+  .tick input:checked + .tick__box path {
+    stroke-dashoffset: 0;
+  }
+  .tick input:focus-visible + .tick__box {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .tick input:checked ~ .tick__text {
+    font-weight: 600;
+    color: var(--navy);
+  }
+</style>

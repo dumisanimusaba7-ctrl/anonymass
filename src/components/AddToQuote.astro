@@ -1,0 +1,126 @@
+---
+// Toggle button that puts a product on the visitor's quote list.
+// The plus rotates away and a tick draws in when the item is on the list.
+interface Props {
+  id: string
+  name: string
+  group: string
+  size?: 'md' | 'sm'
+}
+const { id, name, group, size = 'md' } = Astro.props
+---
+
+<button
+  type="button"
+  class:list={['add-quote', size === 'sm' && 'add-quote--sm']}
+  data-add-quote
+  data-id={id}
+  data-name={name}
+  data-group={group}
+  aria-pressed="false"
+  aria-label={`Add to quote: ${name}`}
+>
+  <svg class="add-quote__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <g class="add-quote__plus"><path d="M10 4v12M4 10h12"></path></g>
+    <path class="add-quote__tick" d="M4.5 10.5l3.5 3.5 7.5-8" pathLength="1"></path>
+  </svg>
+  <!-- The accessible name stays fixed; aria-pressed tells assistive tech
+       whether the item is on the list. -->
+  <span class="add-quote__label" aria-hidden="true">
+    <span class="add-quote__off">Add to quote</span>
+    <span class="add-quote__on">On your list</span>
+  </span>
+</button>
+
+<style>
+  .add-quote {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 44px;
+    padding: 0 var(--s-4) 0 var(--s-3);
+    border: 1px solid var(--indigo);
+    border-radius: var(--r-2);
+    background: var(--surface);
+    color: var(--indigo);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition:
+      background-color var(--dur-2) var(--ease-out),
+      color var(--dur-2) var(--ease-out),
+      border-color var(--dur-2) var(--ease-out),
+      transform var(--dur-1) var(--ease-out);
+  }
+  .add-quote:hover {
+    background: var(--sky-100);
+  }
+  .add-quote:active {
+    transform: translateY(1px);
+  }
+  .add-quote[aria-pressed='true'] {
+    background: var(--indigo);
+    color: #fff;
+  }
+  .add-quote[aria-pressed='true']:hover {
+    background: var(--indigo-800);
+  }
+  .add-quote--sm {
+    min-height: 40px;
+    font-size: 0.875rem;
+    padding: 0 var(--s-3) 0 var(--s-2);
+  }
+
+  .add-quote__icon {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .add-quote__plus {
+    transform-origin: 10px 10px;
+    transition:
+      transform var(--dur-2) var(--ease-out),
+      opacity var(--dur-1) var(--ease-out);
+  }
+  .add-quote__tick {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset var(--dur-2) var(--ease-out);
+  }
+  .add-quote[aria-pressed='true'] .add-quote__plus {
+    transform: rotate(135deg) scale(0.4);
+    opacity: 0;
+  }
+  .add-quote[aria-pressed='true'] .add-quote__tick {
+    stroke-dashoffset: 0;
+    transition-delay: 80ms;
+  }
+
+  .add-quote__label {
+    display: grid;
+  }
+  .add-quote__off,
+  .add-quote__on {
+    grid-area: 1 / 1;
+    transition:
+      opacity var(--dur-1) var(--ease-out),
+      transform var(--dur-2) var(--ease-out);
+  }
+  .add-quote__on {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .add-quote[aria-pressed='true'] .add-quote__off {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  .add-quote[aria-pressed='true'] .add-quote__on {
+    opacity: 1;
+    transform: none;
+  }
+
+</style>
