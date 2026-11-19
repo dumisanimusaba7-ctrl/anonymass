@@ -25,5 +25,8 @@
     "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "^1.65.1",
     "typescript": "~5.9"
+  },
+  "engines": {
+    "node": ">=22.23.4"
   }
 }

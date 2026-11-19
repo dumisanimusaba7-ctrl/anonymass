@@ -69,7 +69,7 @@ All motion is tied to something the visitor does, and every piece is switched of
 
 ## Develop, test, deploy
 
-Requires Node 20 or newer.
+Requires Node 22.23.4 or newer.
 
 ```bash
 npm install
@@ -81,7 +81,7 @@ npm test           # Playwright: layout at 360px, axe accessibility, quote list,
 
 The tests need a Chromium browser. Run `npx playwright install chromium` once, or set `CHROMIUM_PATH` to an existing Chrome or Chromium.
 
-**Deploy:** the site is fully static. On Vercel or Netlify, import the repository. Both detect Astro and use `npm run build` with `dist` as the output folder. Add `PUBLIC_SITE_URL` as an environment variable. No other services, keys or databases are needed.
+**Deploy:** the site is fully static. `netlify.toml` sets the build for Netlify (`npm run build`, publish `dist`, Node 22). Netlify deploys the `main` branch. On Vercel, import the repository and it detects Astro. Add `PUBLIC_SITE_URL` as an environment variable once the domain is live. No other services, keys or databases are needed.
 
 ## Project structure
 
