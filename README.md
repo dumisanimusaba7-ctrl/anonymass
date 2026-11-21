@@ -35,7 +35,7 @@ Visitors browse the range, add products to a **quote list**, and send that list 
 - Real product photos from the company profile, no stock or generated imagery, no emoji icons.
 - No invented numbers, names or testimonials. Every count on the site is computed from the catalogue data.
 - Copy has no buzzwords or em dashes ("Solutions" appears only in the legal company name).
-- WCAG 2.1 AA verified with axe on every page. LCP image has `fetchpriority="high"`. Custom favicon and social card.
+- WCAG 2.1 AA verified with axe on every page. LCP image has `fetchpriority="high"`. Custom favicon and a link-preview card for every page.
 
 ### Motion
 
@@ -57,7 +57,7 @@ All motion is tied to something the visitor does, and every piece is switched of
 3. **Photo quality.** The product photos were extracted from the PDF and some are small (about 130 to 600px wide). The site never upscales them, but original photos would look sharper. Drop replacements into `src/assets/products/` with the same file names.
 4. **Catalogue labels.** Two photos in the PDF carry the wrong heading. The IV stand and Mayo trolley (page 6, labelled "Autoclaves") are shown as "IV stands and instrument trolleys". The pouch sealers (page 7, labelled "Patient trolleys and plinths") are shown as "Pouch sealers". "Hospital funiture" is spelled correctly on the site.
 5. **Not stated in the profile, so not on the site:** opening hours, years trading, prices, delivery areas, brands carried. Add them to the data files if you want them shown.
-6. **Domain.** Set `PUBLIC_SITE_URL` (for example `https://www.optimaindustrial.com`) so canonical links, the sitemap and social cards use the real domain.
+6. **Domain.** When a custom domain is connected in Vercel, set `PUBLIC_SITE_URL` (for example `https://www.optimaindustrial.com`) so canonical links, the sitemap and link previews use it.
 
 ## Editing content
 
@@ -65,7 +65,7 @@ All motion is tied to something the visitor does, and every piece is switched of
 - **Company name, address, phones, emails, WhatsApp:** `src/data/site.ts`
 - **Product photos:** `src/assets/products/` (Astro resizes them and serves WebP automatically)
 - **Colours, type and spacing:** the tokens at the top of `src/styles/global.css`
-- **Social card and PNG icons:** edit `scripts/social.html`, then run `node scripts/social.mjs`
+- **Link-preview cards and PNG icons:** edit `scripts/social.mjs` / `scripts/social.html`, then run `node scripts/social.mjs`
 
 ## Develop, test, deploy
 
@@ -81,7 +81,16 @@ npm test           # Playwright: layout at 360px, axe accessibility, quote list,
 
 The tests need a Chromium browser. Run `npx playwright install chromium` once, or set `CHROMIUM_PATH` to an existing Chrome or Chromium.
 
-**Deploy:** the site is fully static. `netlify.toml` sets the build for Netlify (`npm run build`, publish `dist`, Node 22). Netlify deploys the `main` branch. On Vercel, import the repository and it detects Astro. Add `PUBLIC_SITE_URL` as an environment variable once the domain is live. No other services, keys or databases are needed.
+**Deploy (Vercel):** import the repository in Vercel. `vercel.json` sets the build (`npm run build`, output `dist`), clean URLs without trailing slashes, and cache headers. Vercel deploys `main` to production. No services, keys or databases are needed.
+
+### Link previews
+
+Every page has its own preview card (1200×630 JPEG in `public/og/`) plus Open Graph and Twitter tags, so a link shared on WhatsApp, Facebook, LinkedIn or X shows a picture, title and description.
+
+- Previews need the site's full public address. On Vercel this is picked up automatically from the production domain (the build log prints `[optima] Link previews and canonical URLs use …`). Once a custom domain is connected, add `PUBLIC_SITE_URL` (for example `https://www.optimaindustrial.com`) under **Project Settings → Environment Variables** and redeploy.
+- Share the **production** address (`your-project.vercel.app` or the custom domain). Vercel's preview and deployment URLs are behind Vercel login by default, so WhatsApp and Facebook cannot read them and show no preview.
+- Apps cache previews. To refresh after a change, paste the link into the [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/) and press **Scrape Again**. WhatsApp uses the same cache. For LinkedIn use the [Post Inspector](https://www.linkedin.com/post-inspector/).
+- To change the cards, edit the list at the top of `scripts/social.mjs` (or the layout in `scripts/social.html`) and run `node scripts/social.mjs`.
 
 ## Project structure
 
@@ -94,6 +103,6 @@ src/
   pages/          index, products/index, products/[department], sterile-services, about, contact, quote, 404, robots.txt
   scripts/        quote store and UI, hero mark morph, department explorer, catalogue filter, reveal, motion helpers
   styles/         global.css (tokens and shared components)
-scripts/          social card and icon generator
+scripts/          link-preview card and icon generator
 tests/            Playwright suite
 ```

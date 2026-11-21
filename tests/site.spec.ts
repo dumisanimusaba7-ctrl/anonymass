@@ -221,3 +221,20 @@ test('reduced motion: content is visible and nothing animates', async ({ browser
   expect(hidden).toBe(0)
   await ctx.close()
 })
+
+test('every page has a link-preview card that loads', async ({ page, request }) => {
+  for (const path of pages) {
+    await page.goto(path)
+    const image = await page.locator('meta[property="og:image"]').getAttribute('content')
+    const width = await page.locator('meta[property="og:image:width"]').getAttribute('content')
+    expect(image, `${path} og:image`).toMatch(/^https?:\/\/.+\/og\/[a-z-]+\.jpg$/)
+    expect(width).toBe('1200')
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', /.+/)
+    await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image')
+    // Fetch the card from this server (the absolute host may not exist locally).
+    const res = await request.get(new URL(image!).pathname)
+    expect(res.status(), `${path} card`).toBe(200)
+    expect(res.headers()['content-type']).toContain('image/jpeg')
+    expect((await res.body()).length).toBeLessThan(300_000)
+  }
+})

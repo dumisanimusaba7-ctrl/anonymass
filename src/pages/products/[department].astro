@@ -30,6 +30,8 @@ const itemTotal = d.categories.reduce((n, c) => n + (c.items?.length ?? 0), 0)
 
 <Base
   title={`${d.name} | Optima Medical Supplies, Kitwe`}
+  image={`/og/${d.slug}.jpg`}
+  imageAlt={`Optima Medical Supplies: ${d.name}`}
   description={`${d.summary} Supplied by Optima Industrial Solutions in Kitwe, Zambia. Add what you need to a quote list and send it on WhatsApp or email.`}
 >
   <section class="dept-hero">
