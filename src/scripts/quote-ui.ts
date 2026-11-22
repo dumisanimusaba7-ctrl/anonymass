@@ -45,7 +45,9 @@ function fly(from: HTMLElement) {
   const x0 = a.left + a.width / 2
   const y0 = a.top + a.height / 2
   const x1 = b.left + b.width / 2
-  const y1 = b.top + b.height / 2
+  // If the header is still sliding back in, aim for where it will settle.
+  const header = target.closest<HTMLElement>('[data-header]')
+  const y1 = b.top + b.height / 2 - (header ? header.getBoundingClientRect().top : 0)
   const dot = document.createElement('div')
   dot.className = 'quote-fly'
   dot.setAttribute('aria-hidden', 'true')
@@ -74,9 +76,13 @@ function toggle(el: HTMLElement) {
   }
   if (quote.has(item.id)) {
     quote.remove(item.id)
+    navigator.vibrate?.([6, 40, 6])
     live()!.textContent = `${item.name} removed from your quote list.`
   } else {
     quote.add(item)
+    navigator.vibrate?.(12)
+    // Make sure the counter the dot flies to is on screen.
+    window.dispatchEvent(new Event('header:show'))
     fly(el)
     live()!.textContent = `${item.name} added to your quote list. ${quote.count()} on the list.`
   }

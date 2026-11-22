@@ -27,7 +27,9 @@ import { whatsappLink } from '../../data/site'
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
           <input type="search" placeholder="Search, e.g. gloves, autoclave, pipettes" autocomplete="off" data-search />
         </label>
-        <div class="chips" role="group" aria-label="Filter by department">
+        <div class="scroller chips-scroller" data-scroller>
+        <div class="chips" role="group" aria-label="Filter by department" data-scroller-track>
+          <span class="scroller__indicator" data-scroller-indicator aria-hidden="true"></span>
           <button type="button" class="chip" aria-pressed="true" data-dept="">All</button>
           {
             departments.map((d) => (
@@ -36,6 +38,8 @@ import { whatsappLink } from '../../data/site'
               </button>
             ))
           }
+        </div>
+        <div class="scroller__rail chips-rail" aria-hidden="true" hidden><span></span></div>
         </div>
         <p class="cat-status" role="status" data-status>Showing all {categoryCount} categories</p>
       </div>
@@ -116,26 +120,32 @@ import { whatsappLink } from '../../data/site'
     outline-offset: 1px;
     border-color: var(--navy);
   }
-  .chips {
-    display: flex;
-    gap: var(--s-2);
-    overflow-x: auto;
+  .chips-scroller {
     margin-inline: calc(var(--gutter) * -1);
-    padding: 2px var(--gutter);
-    scrollbar-width: none;
   }
-  .chips::-webkit-scrollbar {
-    display: none;
+  .chips {
+    gap: var(--s-2);
+    padding: 2px var(--gutter);
+  }
+  .chips-rail {
+    margin-inline: var(--gutter);
   }
   @media (min-width: 1024px) {
+    .chips-scroller {
+      margin: 0;
+    }
     .chips {
       flex-wrap: wrap;
       overflow: visible;
-      margin: 0;
       padding: 0;
+    }
+    .chips-rail {
+      display: none;
     }
   }
   .chip {
+    position: relative;
+    z-index: 1;
     flex: none;
     min-height: 44px;
     padding: 0 var(--s-4);
@@ -156,6 +166,12 @@ import { whatsappLink } from '../../data/site'
     background: var(--indigo);
     border-color: var(--indigo);
     color: #fff;
+  }
+  /* With the sliding marker running, chips are see-through so it can glide
+     behind them. */
+  :global(.has-indicator) .chip,
+  :global(.has-indicator) .chip[aria-pressed='true'] {
+    background: transparent;
   }
   .cat-status {
     font-size: var(--fs-small);

@@ -259,11 +259,19 @@ select {
 }
 
 /* -------------------------------------------------------------- buttons --- */
+/* Each variant sets a resting colour (--btn-bg) and a hover colour
+   (--btn-hover). On devices with a mouse the hover colour wipes in from the
+   left; elsewhere it simply swaps. */
 
 .btn {
   --btn-bg: var(--primary);
+  --btn-hover: var(--primary-hover);
   --btn-fg: #fff;
   --btn-border: var(--primary);
+  --btn-border-hover: var(--primary-hover);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -287,11 +295,11 @@ select {
     transform var(--dur-1) var(--ease-out);
 }
 .btn:hover {
-  --btn-bg: var(--primary-hover);
-  --btn-border: var(--primary-hover);
+  background: var(--btn-hover);
+  border-color: var(--btn-border-hover);
 }
 .btn:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.99);
 }
 .btn:disabled,
 .btn[aria-disabled='true'] {
@@ -304,34 +312,48 @@ select {
   flex: none;
 }
 
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:hover {
+    background: var(--btn-bg);
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--btn-hover);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 360ms var(--ease-out);
+  }
+  .btn:hover::before {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
+}
+
 .btn--light {
   --btn-bg: #fff;
+  --btn-hover: var(--ice);
   --btn-fg: var(--navy);
   --btn-border: #fff;
-}
-.btn--light:hover {
-  --btn-bg: var(--ice);
-  --btn-border: var(--ice);
+  --btn-border-hover: var(--ice);
 }
 
 .btn--outline {
   --btn-bg: transparent;
+  --btn-hover: var(--surface);
   --btn-fg: var(--navy);
   --btn-border: var(--border-strong);
-}
-.btn--outline:hover {
-  --btn-bg: var(--surface);
-  --btn-border: var(--navy);
+  --btn-border-hover: var(--navy);
 }
 
 .btn--outline-light {
   --btn-bg: transparent;
+  --btn-hover: rgb(255 255 255 / 0.1);
   --btn-fg: #fff;
   --btn-border: rgb(255 255 255 / 0.45);
-}
-.btn--outline-light:hover {
-  --btn-bg: rgb(255 255 255 / 0.08);
-  --btn-border: #fff;
+  --btn-border-hover: #fff;
 }
 
 .btn--sm {
@@ -448,6 +470,16 @@ select {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+/* Cut-outs on white sit inside the circle with room to spare, so no corner
+   of the photo ever meets the curved edge. Full photos fill the circle. */
+.lens--contain img {
+  object-fit: contain;
+  padding: 17%;
+}
+.lens--cover img {
+  object-fit: cover;
+  padding: 0;
 }
 
 /* ------------------------------------------------------------ reveal ---- */
@@ -587,4 +619,112 @@ select {
 ::view-transition-old(*):only-child,
 ::view-transition-new(*):only-child {
   animation-timing-function: var(--ease-out);
+}
+
+/* ----------------------------------------------------- scroller (rows) --- */
+/* Horizontal rows of tabs or chips on phones: snap to items, a marker that
+   slides to the active item, and a rail that shows where you are in the row. */
+
+.scroller {
+  position: relative;
+  /* As a grid or flex item it must be allowed to shrink below the width of
+     its row, or the whole page widens to fit every tab. */
+  min-width: 0;
+}
+[data-scroller-track] {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+[data-scroller-track]::-webkit-scrollbar {
+  display: none;
+}
+/* Snap to item centres, the same place the active item is scrolled to. */
+[data-scroller-track] > * {
+  scroll-snap-align: center;
+}
+.scroller__indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 0;
+  border-radius: var(--r-2);
+  background: var(--indigo);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    transform 420ms var(--ease-out),
+    width 420ms var(--ease-out),
+    height 420ms var(--ease-out),
+    opacity var(--dur-1) var(--ease-out);
+}
+.has-indicator .scroller__indicator {
+  opacity: 1;
+}
+.scroller__rail {
+  position: relative;
+  height: 3px;
+  margin: var(--s-3) 0 0;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+.scroller__rail span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--thumb-w, 30%);
+  border-radius: 2px;
+  background: var(--indigo);
+  transform: translateX(var(--thumb-x, 0px));
+}
+
+/* --------------------------------------------- navigation progress bar --- */
+
+.nav-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  z-index: 70;
+  pointer-events: none;
+}
+.nav-progress span {
+  display: block;
+  height: 100%;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+}
+.nav-progress.is-loading span {
+  opacity: 1;
+  transform: scaleX(0.72);
+  transition: transform 1.6s cubic-bezier(0.1, 0.7, 0.2, 1);
+}
+.nav-progress.is-done span {
+  opacity: 0;
+  transform: scaleX(1);
+  transition:
+    transform 220ms var(--ease-out),
+    opacity 260ms var(--ease-in) 200ms;
+}
+
+/* ------------------------------------------------ photo settle on reveal --- */
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] .plate__well img,
+  [data-reveal] .cssd__img img,
+  [data-reveal] .flow__img img {
+    transition: transform 900ms var(--ease-out);
+  }
+  .reveal-ready [data-reveal]:not(.is-in) .plate__well img,
+  .reveal-ready [data-reveal]:not(.is-in) .flow__img img {
+    transform: scale(1.08);
+  }
 }

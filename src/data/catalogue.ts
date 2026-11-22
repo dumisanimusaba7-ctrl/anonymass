@@ -48,6 +48,12 @@ export interface Department {
   intro: string
   image: ImageMetadata
   alt: string
+  /**
+   * How the photo sits in a round frame: `contain` for cut-outs on white
+   * (kept clear of the curved edge), `cover` for full photos (filled edge to
+   * edge, so no rectangle shows inside the circle).
+   */
+  fit: 'contain' | 'cover'
   categories: Category[]
 }
 
@@ -61,6 +67,7 @@ export const departments: Department[] = [
       'Bedside and theatre monitoring, ultrasound scanning and imaging. If you are replacing a unit, add the make and model to your quote list so we can quote the right equipment.',
     image: medicalEquipment,
     alt: 'Ultrasound scanner, patient monitor and ECG machine',
+    fit: 'contain',
     categories: [
       {
         slug: 'medical-equipment',
@@ -94,6 +101,7 @@ export const departments: Department[] = [
       'From the instrument tray to the table. Instruments, anaesthesia consumables, tables, positioning, seating and the stands and trolleys around them.',
     image: surgicalInstruments,
     alt: 'Rows of stainless steel surgical instruments',
+    fit: 'cover',
     categories: [
       {
         slug: 'surgical-instruments',
@@ -154,6 +162,7 @@ export const departments: Department[] = [
     intro: 'Furniture and equipment for wards, emergency rooms and consulting rooms, plus first aid kits for any workplace.',
     image: hospitalFurniture,
     alt: 'Hospital bed, emergency trolley, IV stand, wheelchair and scale',
+    fit: 'contain',
     categories: [
       {
         slug: 'hospital-furniture',
@@ -187,6 +196,7 @@ export const departments: Department[] = [
       'Equipment for each step of a sterile services department, from the packing bench to the storage shelf. We also install autoclaves and maintain them.',
     image: autoclave,
     alt: 'Floor-standing autoclave with a control panel',
+    fit: 'cover',
     categories: [
       {
         slug: 'packing-tables',
@@ -241,6 +251,7 @@ export const departments: Department[] = [
     intro: 'The stock that runs out first. Gloves, dressings, disinfectants, waste containers, uniforms and theatre shoes.',
     image: gloves,
     alt: 'Box of powder-free latex gloves with a glove beside it',
+    fit: 'contain',
     categories: [
       {
         slug: 'gloves',
@@ -295,6 +306,7 @@ export const departments: Department[] = [
       'Chemicals in bulk and by grade, with the glass and plastic ware to measure, mix, filter and store them. Tick what you need and it goes on your quote list.',
     image: labGlassware,
     alt: 'Laboratory flasks and a Schott bottle holding blue and red liquids',
+    fit: 'cover',
     categories: [
       {
         slug: 'lab-chemicals',

@@ -10,19 +10,37 @@ onPage(() => {
   const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')]
   const panels = [...root.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
 
+  const stage = root.querySelector<HTMLElement>('[data-dept-stage]')!
+  let resize: Animation | null = null
+
   function select(tab: HTMLButtonElement, focus = false) {
     if (tab.getAttribute('aria-selected') === 'true') return
     const next = panels.find((p) => p.id === tab.getAttribute('aria-controls'))!
+    const before = stage.getBoundingClientRect().height
     tabs.forEach((t) => {
       const on = t === tab
       t.setAttribute('aria-selected', String(on))
       t.tabIndex = on ? 0 : -1
     })
     panels.forEach((p) => (p.hidden = p !== next))
-    if (focus) tab.focus()
-    tab.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' })
+    // The row scrolls the tab into the middle itself (see scroller.ts).
+    if (focus) tab.focus({ preventScroll: true })
 
     if (reducedMotion()) return
+
+    // Departments have 3 to 7 categories: ease the height change instead of
+    // letting the page below jump.
+    const after = stage.getBoundingClientRect().height
+    resize?.cancel()
+    if (Math.abs(after - before) > 1) {
+      stage.style.overflow = 'hidden'
+      resize = stage.animate([{ height: `${before}px` }, { height: `${after}px` }], {
+        duration: 420,
+        easing: 'cubic-bezier(.2,.8,.2,1)',
+      })
+      resize.finished.then(() => (stage.style.overflow = '')).catch(() => {})
+    }
+
     const lens = next.querySelector<HTMLElement>('[data-dept-lens]')
     lens?.animate(
       [

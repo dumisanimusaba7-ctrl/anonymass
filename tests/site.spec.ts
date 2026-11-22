@@ -198,7 +198,7 @@ test('contact form validates and opens WhatsApp with the message', async ({ page
   await expect(page.getByText(/WhatsApp should now be open/)).toBeVisible()
 })
 
-test('hero mark morphs into a cross on scroll', async ({ page }) => {
+test('hero mark morphs into a red cross on scroll', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/')
   await page.waitForTimeout(1500)
@@ -206,7 +206,43 @@ test('hero mark morphs into a cross on scroll', async ({ page }) => {
   expect(await fill()).toBe('#ef5d22')
   await page.mouse.wheel(0, 500)
   await page.waitForTimeout(400)
-  expect(await fill()).toBe('#ffffff')
+  expect(await fill()).toBe('#e30613')
+})
+
+test('header tucks away on scroll down and returns on scroll up', async ({ page }) => {
+  await page.goto('/products')
+  await settle(page)
+  const header = page.locator('[data-header]')
+  await page.mouse.wheel(0, 900)
+  await expect(header).toHaveClass(/is-tucked/)
+  await page.mouse.wheel(0, -200)
+  await expect(header).not.toHaveClass(/is-tucked/)
+})
+
+test('department row on phones: active tab centred, marker and rail shown', async ({ browser }) => {
+  const ctx = await browser.newContext(phone)
+  const page = await ctx.newPage()
+  await page.goto('/')
+  await settle(page)
+  const track = page.locator('.depts__tabs')
+  await expect(page.locator('.depts__rail')).toBeVisible()
+  await page.getByRole('tab', { name: /Sterile services and storage/ }).click()
+  await page.waitForTimeout(700)
+  const centred = await page.evaluate(() => {
+    const t = document.querySelector('.depts__tabs')!.getBoundingClientRect()
+    const a = document.querySelector('#tab-sterile-services')!.getBoundingClientRect()
+    return Math.abs(a.left + a.width / 2 - (t.left + t.width / 2))
+  })
+  expect(centred).toBeLessThan(24)
+  const marker = await page.locator('.depts__tabs .scroller__indicator').boundingBox()
+  const tab = await page.locator('#tab-sterile-services').boundingBox()
+  expect(Math.abs(marker!.x - tab!.x)).toBeLessThan(2)
+  expect(Math.abs(marker!.width - tab!.width)).toBeLessThan(2)
+  // Each department photo stays inside its circle frame
+  const lens = await page.locator('#panel-sterile-services .dept-panel__lens').boundingBox()
+  expect(lens!.width).toBeLessThan(130)
+  await expect(track).toBeVisible()
+  await ctx.close()
 })
 
 test('reduced motion: content is visible and nothing animates', async ({ browser }) => {

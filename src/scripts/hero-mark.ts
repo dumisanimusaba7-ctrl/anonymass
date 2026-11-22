@@ -2,8 +2,13 @@ import { BLADES, BLADE_COLOURS, CROSS, align, toPath, type Point } from './mark-
 import { clamp, easeInOut, lerp, mix, onPage, reducedMotion } from './motion'
 
 // Hero signature: the four Optima blades assemble on arrival, then morph
-// into a medical cross as the visitor scrolls out of the hero. Driven by
-// scroll position, never by a timer loop.
+// into a red medical cross as the visitor scrolls out of the hero, while the
+// photo lenses drift at different depths. Driven by scroll position, never by
+// a timer loop.
+
+const CROSS_RED = '#e30613'
+// How far each lens drifts up over the hero's height (px): back to front.
+const LENS_DEPTH = [-36, -72, -108]
 
 const rotate = ([x, y]: Point, deg: number): Point => {
   const r = (deg * Math.PI) / 180
@@ -56,11 +61,19 @@ onPage(() => {
   const markPageTop = svg.getBoundingClientRect().top + window.scrollY
   let frame = 0
   let last = -1
+  let lensReady = false
+  setTimeout(() => (lensReady = true), 900) // after the arrival animation
   const update = () => {
     frame = 0
-    const headerBottom = document.querySelector('[data-header]')?.getBoundingClientRect().bottom ?? 0
+    const heroRect = hero.getBoundingClientRect()
+    if (lensReady) {
+      const depth = clamp(-heroRect.top / heroRect.height)
+      lenses.forEach((lens, i) => (lens.style.transform = `translate3d(0, ${(LENS_DEPTH[i] ?? 0) * depth}px, 0)`))
+    }
+    // Header height, not its position: the header slides away on scroll.
+    const headerHeight = document.querySelector<HTMLElement>('[data-header]')?.offsetHeight ?? 0
     const from = Math.min(markPageTop, window.innerHeight * 0.6)
-    const to = headerBottom + 16
+    const to = headerHeight + 16
     const top = markPageTop - window.scrollY
     const t = clamp((from - top) / Math.max(1, from - to))
     if (Math.abs(t - last) < 0.001) return
@@ -68,7 +81,7 @@ onPage(() => {
     const e = easeInOut(t)
     blades.forEach((blade, i) => {
       const pts = BLADES[i].map(([x, y], j): Point => [lerp(x, TARGETS[i][j][0], e), lerp(y, TARGETS[i][j][1], e)])
-      const colour = mix(BLADE_COLOURS[i], '#ffffff', e)
+      const colour = mix(BLADE_COLOURS[i], CROSS_RED, e)
       blade.setAttribute('d', toPath(pts))
       blade.setAttribute('fill', colour)
       blade.setAttribute('stroke', colour)

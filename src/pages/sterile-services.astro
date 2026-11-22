@@ -57,7 +57,7 @@ const extras = [cat('stainless-furniture'), cat('medical-fridges')]
           <a class="btn btn--outline-light" href="#flow">See each step</a>
         </div>
       </div>
-      <div class="lens ss-hero__lens" transition:name="dept-img-sterile-services">
+      <div class={`lens lens--${d.fit} ss-hero__lens`} transition:name="dept-img-sterile-services">
         <Image src={d.image} alt={d.alt} widths={[240, 339]} sizes="(min-width: 1024px) 320px, 60vw" loading="eager" fetchpriority="high" />
       </div>
     </div>
@@ -172,10 +172,6 @@ const extras = [cat('stainless-furniture'), cat('medical-fridges')]
   .ss-hero__lens {
     width: min(60vw, 320px);
     margin-inline: auto;
-  }
-  .ss-hero__lens :global(img) {
-    object-fit: contain;
-    padding: 12%;
   }
 
   /* Flow with a progress line that fills as you scroll. */

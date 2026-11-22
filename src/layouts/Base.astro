@@ -91,6 +91,7 @@ const localBusiness = {
     <slot name="head" />
   </head>
   <body>
+    <div class="nav-progress" data-nav-progress transition:persist="nav-progress" aria-hidden="true"><span></span></div>
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
     <main id="main" transition:name="main">
@@ -105,4 +106,5 @@ const localBusiness = {
 <script>
   import '../scripts/reveal'
   import '../scripts/quote-ui'
+  import '../scripts/scroller'
 </script>

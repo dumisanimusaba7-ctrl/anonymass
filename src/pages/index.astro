@@ -14,6 +14,7 @@ import pouchSealer from '../assets/products/pouch-sealer.jpg'
 import autoclave from '../assets/products/autoclave.jpg'
 import sterileShelving from '../assets/products/sterile-shelving.jpg'
 
+const headline = 'Send one list. Equip the ward, the theatre and the lab.'
 const lab = departmentBySlug('laboratory')!
 const stations = [
   { step: 'Pack', name: 'Packing tables', image: packingTable, alt: 'Stainless packing table' },
@@ -32,7 +33,17 @@ const stations = [
     <div class="container hero__grid">
       <div class="hero__copy">
         <p class="eyebrow">Medical supplies · Kitwe, Zambia</p>
-        <h1>Send one list. Equip the ward, the theatre and the lab.</h1>
+        <h1 class="split">
+          {
+            headline.split(' ').map((word, i) => (
+              <>
+                <span class="split__w">
+                  <span style={`--i:${i}`}>{word}</span>
+                </span>{' '}
+              </>
+            ))
+          }
+        </h1>
         <p class="lead">
           Optima supplies medical equipment, hospital furniture, consumables and laboratory ware. Pick what you need,
           send us the list, and we reply with a quote.
@@ -47,13 +58,13 @@ const stations = [
       </div>
 
       <div class="hero__visual" aria-hidden="true">
-        <div class="lens lens--a" data-lens>
+        <div class="lens lens--cover lens--a" data-lens>
           <Image src={labGlassware} alt="" widths={[320, 520]} sizes="(min-width: 1024px) 340px, 52vw" loading="eager" fetchpriority="high" />
         </div>
-        <div class="lens lens--b" data-lens>
+        <div class="lens lens--cover lens--b" data-lens>
           <Image src={surgicalInstruments} alt="" widths={[240, 400]} sizes="(min-width: 1024px) 220px, 34vw" loading="eager" />
         </div>
-        <div class="lens lens--c" data-lens>
+        <div class="lens lens--contain lens--c" data-lens>
           <Image src={hospitalFurniture} alt="" widths={[200, 360]} sizes="(min-width: 1024px) 180px, 28vw" loading="eager" />
         </div>
         <Mark size={240} class="hero__mark" id="hero-mark" />
@@ -73,7 +84,9 @@ const stations = [
       </div>
 
       <div class="depts__ui" data-dept-selector>
-        <div class="depts__tabs" role="tablist" aria-label="Departments">
+        <div class="scroller depts__scroller" data-scroller>
+        <div class="depts__tabs" role="tablist" aria-label="Departments" data-scroller-track>
+          <span class="scroller__indicator" data-scroller-indicator aria-hidden="true"></span>
           {
             departments.map((d, i) => (
               <button
@@ -91,8 +104,10 @@ const stations = [
             ))
           }
         </div>
+        <div class="scroller__rail depts__rail" aria-hidden="true" hidden><span></span></div>
+        </div>
 
-        <div class="depts__stage">
+        <div class="depts__stage" data-dept-stage>
           {
             departments.map((d, i) => (
               <div
@@ -103,8 +118,13 @@ const stations = [
                 hidden={i !== 0}
                 data-slug={d.slug}
               >
-                <div class="lens dept-panel__lens" data-dept-lens>
-                  <Image src={d.image} alt={d.alt} widths={[320, 480, Math.min(640, d.image.width)].filter((w) => w <= d.image.width)} sizes="(min-width: 1024px) 360px, 72vw" />
+                <div class={`lens lens--${d.fit} dept-panel__lens`} data-dept-lens>
+                  <Image
+                    src={d.image}
+                    alt={d.alt}
+                    widths={[240, 360, 480, Math.min(640, d.image.width)].filter((w) => w <= d.image.width)}
+                    sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 128px"
+                  />
                 </div>
                 <div class="dept-panel__text">
                   <p class="dept-panel__summary">{d.summary}</p>
@@ -273,6 +293,28 @@ const stations = [
   .hero h1 {
     max-width: 13ch;
   }
+  /* Headline: each word rises out of its own line box, once, on arrival. */
+  .split__w {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .split__w > span {
+    display: inline-block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .split__w > span {
+      animation: word-rise 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: calc(80ms + var(--i) * 55ms);
+    }
+  }
+  @keyframes word-rise {
+    from {
+      transform: translateY(105%);
+    }
+  }
   .hero .lead {
     margin-top: var(--s-5);
     color: #e6e7f5;
@@ -334,10 +376,6 @@ const stations = [
     right: 8%;
     bottom: 0;
   }
-  .lens--c :global(img) {
-    object-fit: contain;
-    padding: 8%;
-  }
 
   /* ---------------------------------------------------------- departments */
   .depts__head {
@@ -364,36 +402,41 @@ const stations = [
       gap: var(--s-8);
     }
   }
-  .depts__tabs {
-    display: flex;
-    gap: var(--s-2);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+  .depts__scroller {
     margin-inline: calc(var(--gutter) * -1);
-    padding: 2px var(--gutter) var(--s-2);
-    scrollbar-width: none;
   }
-  .depts__tabs::-webkit-scrollbar {
-    display: none;
+  .depts__tabs {
+    gap: var(--s-2);
+    padding: 2px var(--gutter);
+  }
+  .depts__rail {
+    margin-inline: var(--gutter);
   }
   @media (min-width: 1024px) {
+    .depts__scroller {
+      margin: 0;
+    }
     .depts__tabs {
       flex-direction: column;
       gap: 0;
       overflow: visible;
-      margin: 0;
       padding: 0;
       border-top: 1px solid var(--border);
     }
+    .depts__tabs :global(.scroller__indicator),
+    .depts__rail {
+      display: none;
+    }
   }
   .dept-tab {
-    scroll-snap-align: start;
+    position: relative;
+    z-index: 1;
     flex: none;
     display: flex;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--s-4);
-    min-height: 48px;
+    gap: var(--s-3);
+    min-height: 44px;
     padding: var(--s-2) var(--s-4);
     border: 1px solid var(--border);
     border-radius: var(--r-2);
@@ -402,20 +445,21 @@ const stations = [
     cursor: pointer;
     transition:
       background-color var(--dur-1) var(--ease-out),
-      color var(--dur-1) var(--ease-out),
+      color var(--dur-2) var(--ease-out),
       border-color var(--dur-1) var(--ease-out);
   }
   .dept-tab__name {
     font-family: var(--font-display);
     font-weight: 600;
-    font-size: 1.375rem;
+    font-size: 1.25rem;
     line-height: 1.1;
     white-space: nowrap;
   }
   .dept-tab__count {
-    font-size: var(--fs-small);
+    font-size: 0.8125rem;
     color: var(--muted);
     font-variant-numeric: tabular-nums;
+    transition: color var(--dur-2) var(--ease-out);
   }
   .dept-tab[aria-selected='true'] {
     background: var(--indigo);
@@ -425,18 +469,29 @@ const stations = [
   .dept-tab[aria-selected='true'] .dept-tab__count {
     color: var(--on-indigo-muted);
   }
+  /* With the sliding marker running, tabs are see-through so the marker can
+     glide behind them. */
+  .has-indicator .dept-tab {
+    background: transparent;
+  }
+  .has-indicator .dept-tab[aria-selected='true'] {
+    background: transparent;
+  }
   @media (min-width: 1024px) {
-    .dept-tab {
+    .dept-tab,
+    .has-indicator .dept-tab {
       border: 0;
       border-bottom: 1px solid var(--border);
       border-radius: 0;
       background: transparent;
       padding: var(--s-4) var(--s-2);
-      position: relative;
     }
     .dept-tab__name {
       font-size: 2rem;
       white-space: normal;
+    }
+    .dept-tab__count {
+      font-size: var(--fs-small);
     }
     .dept-tab::before {
       content: '';
@@ -453,10 +508,12 @@ const stations = [
     .dept-tab:hover .dept-tab__name {
       color: var(--indigo);
     }
-    .dept-tab[aria-selected='true'] {
+    .dept-tab[aria-selected='true'],
+    .has-indicator .dept-tab[aria-selected='true'] {
       background: transparent;
       color: var(--navy);
       padding-left: var(--s-5);
+      transition: padding var(--dur-3) var(--ease-out);
     }
     .dept-tab[aria-selected='true']::before {
       transform: scaleX(1);
@@ -470,32 +527,64 @@ const stations = [
   .depts__stage {
     position: relative;
   }
+  /* Phones: small photo beside the summary, the list underneath. */
   .dept-panel {
     display: grid;
-    gap: var(--s-6);
+    grid-template-columns: 112px minmax(0, 1fr);
+    grid-template-areas:
+      'lens summary'
+      'list list'
+      'cta cta';
+    gap: var(--s-4) var(--s-4);
     align-items: center;
+  }
+  .dept-panel__text {
+    display: contents;
+  }
+  .dept-panel__lens {
+    grid-area: lens;
+    width: 112px;
+    border-width: 4px;
+  }
+  .dept-panel__summary {
+    grid-area: summary;
+  }
+  .dept-panel__list {
+    grid-area: list;
+  }
+  .dept-panel [data-dept-link] {
+    grid-area: cta;
+    justify-self: start;
   }
   @media (min-width: 640px) {
     .dept-panel {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas: none;
+      gap: var(--s-6);
     }
-  }
-  .dept-panel__lens {
-    width: min(100%, 380px);
-    margin-inline: auto;
-  }
-  .dept-panel__lens :global(img) {
-    object-fit: contain;
-    padding: 10%;
+    .dept-panel__text {
+      display: block;
+    }
+    .dept-panel__lens {
+      grid-area: auto;
+      width: min(100%, 380px);
+      margin-inline: auto;
+      border-width: 6px;
+    }
   }
   .dept-panel__summary {
     color: var(--muted);
   }
   .dept-panel__list {
     list-style: none;
-    margin: var(--s-4) 0 var(--s-5);
+    margin: 0;
     padding: 0;
     border-top: 1px solid var(--border);
+  }
+  @media (min-width: 640px) {
+    .dept-panel__list {
+      margin: var(--s-4) 0 var(--s-5);
+    }
   }
   .dept-panel__list a {
     display: flex;

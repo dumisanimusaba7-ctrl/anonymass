@@ -22,7 +22,7 @@ Visitors browse the range, add products to a **quote list**, and send that list 
 - **Colours** are sampled from the profile PDF: indigo `#333399` (cover), navy `#000066` (lab panel), sky blue `#5B9BD5` (catalogue label bars), ice blue `#CCECFF` and red (cover wave), and the four logo blade colours. The red is darkened very slightly to `#E30613` so it passes WCAG AA as text. Catalogue label bars keep the exact sky blue but use navy text, because white on that blue fails contrast.
 - **Type**: Saira Extra Condensed for headings (closest free match to the tall, rounded wordmark) and Jost for body text (a geometric face in the spirit of the Century Gothic used in the profile). Both are self-hosted.
 - **Logo**: the four-blade mark is redrawn as an SVG from a 400 dpi render of the profile, keeping its 90° symmetry. It always sits on indigo, as in the profile.
-- **Signature element**: the logo blades. They assemble when the home page opens and morph into a medical cross as you scroll. The header mark turns a quarter each time you change page.
+- **Signature element**: the logo blades. They assemble when the home page opens and morph into a red medical cross as you scroll. The header mark turns a quarter each time you change page.
 - **Brand devices reused**: circular photo "lenses" with an ice-blue rim (profile cover), sky-blue label bars over product photos (profile catalogue pages), and the red-and-ice wave (cover), used once, on top of the footer.
 
 ### Anti-AI-Slop Guide checklist
@@ -32,7 +32,7 @@ Visitors browse the range, add products to a **quote list**, and send that list 
 - No pulsing or "Live"/"New" badges. The only red badge is the quote count, and it only shows when the list has items.
 - No badge above the H1, no thick one-sided card borders, no row of three identical icon cards.
 - Small radius scale (4/8/12px). Circles are used only for the brand lens device.
-- Real product photos from the company profile, no stock or generated imagery, no emoji icons.
+- Real product photos from the company profile, no stock or generated imagery, no emoji icons. Round frames fit each photo: cut-outs sit clear of the curved edge, full photos fill it.
 - No invented numbers, names or testimonials. Every count on the site is computed from the catalogue data.
 - Copy has no buzzwords or em dashes ("Solutions" appears only in the legal company name).
 - WCAG 2.1 AA verified with axe on every page. LCP image has `fetchpriority="high"`. Custom favicon and a link-preview card for every page.
@@ -41,14 +41,17 @@ Visitors browse the range, add products to a **quote list**, and send that list 
 
 All motion is tied to something the visitor does, and every piece is switched off under `prefers-reduced-motion`.
 
-- Hero: logo blades assemble on arrival; scroll morphs them into a medical cross.
-- Page transitions (Astro view transitions): the header persists, content fades up, and a department's photo and title morph into the department page header.
-- Department explorer: circular wipe on the photo, category list comes in line by line.
+- Hero: the headline rises in word by word on arrival; the logo blades assemble, then morph into a red medical cross as you scroll, while the three photo circles drift at different depths.
+- Header: slides away while you scroll down to read and comes back as soon as you scroll up (or tab into it).
+- Page transitions (Astro view transitions): a thin red progress bar runs along the top, the header stays put, content fades up, and a department's photo and title morph into the department page header.
+- Department explorer: an indigo marker slides to the chosen department, the row scrolls it into the middle on phones, the panel height eases between departments, and the photo opens with a circular wipe.
+- Horizontal rows on phones (departments, product filters): snap to items, the active item centres itself, and a rail under the row shows where you are and that there is more.
 - Products filter: tiles slide to their new positions (FLIP) instead of jumping.
-- Add to quote: the plus turns into a drawn tick, a red dot flies to the quote counter, and the counter bumps.
+- Add to quote: the plus turns into a drawn tick, a red dot flies to the quote counter, the counter bumps, and phones that support it give a short haptic tick.
+- Buttons: on devices with a mouse the hover colour wipes in from the left.
+- Scroll reveal: one type (fade and 12px rise), played once; product photos settle from a slight zoom as they appear.
 - Sterile services: a progress line fills as you scroll and each step lights up when reached.
 - Mobile menu: circular wipe from the menu button; the hamburger morphs into a cross.
-- One scroll-reveal type (fade and 12px rise), played once.
 
 ## Before launch: please confirm
 

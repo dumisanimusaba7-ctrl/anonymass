@@ -44,7 +44,7 @@ const itemTotal = d.categories.reduce((n, c) => n + (c.items?.length ?? 0), 0)
           {d.categories.length} categories{isLab && `, ${itemTotal} items`} · from the 2024 company profile
         </p>
       </div>
-      <div class="lens dept-hero__lens" transition:name={`dept-img-${d.slug}`}>
+      <div class={`lens lens--${d.fit} dept-hero__lens`} transition:name={`dept-img-${d.slug}`}>
         <Image
           src={d.image}
           alt={d.alt}
@@ -146,10 +146,6 @@ const itemTotal = d.categories.reduce((n, c) => n + (c.items?.length ?? 0), 0)
   .dept-hero__lens {
     width: min(70vw, 380px);
     margin-inline: auto;
-  }
-  .dept-hero__lens :global(img) {
-    object-fit: contain;
-    padding: 10%;
   }
 
   .plates {

@@ -82,6 +82,13 @@ const nav = [
     top: 0;
     z-index: 40;
     border-bottom: 1px solid rgb(255 255 255 / 0.14);
+    transition: transform 360ms var(--ease-out);
+  }
+  /* Slides away while you scroll down to read, comes back as soon as you
+     scroll up. (No transform at rest: the full-screen menu is fixed inside.) */
+  .site-header.is-tucked {
+    transform: translateY(-100%);
+    transition-timing-function: var(--ease-in);
   }
   .site-header__inner {
     height: var(--header-h);
@@ -362,6 +369,50 @@ const nav = [
       else a.removeAttribute('aria-current')
     })
   }
+
+  // Tuck the header away while scrolling down; bring it back on scroll up,
+  // near the top of the page, on keyboard focus and when asked to.
+  let lastY = window.scrollY
+  let ticking = false
+  const tuck = (on: boolean) => header.classList.toggle('is-tucked', on)
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        ticking = false
+        const y = window.scrollY
+        const dy = y - lastY
+        if (button.getAttribute('aria-expanded') === 'true' || y < 140) tuck(false)
+        else if (dy > 6) tuck(true)
+        else if (dy < -6) tuck(false)
+        if (Math.abs(dy) > 6 || y < 140) lastY = y
+      })
+    },
+    { passive: true },
+  )
+  header.addEventListener('focusin', () => tuck(false))
+  window.addEventListener('header:show', () => tuck(false))
+
+  // A thin red bar shows progress while the next page loads.
+  const progress = document.querySelector<HTMLElement>('[data-nav-progress]')
+  let doneTimer = 0
+  document.addEventListener('astro:before-preparation', () => {
+    if (!progress) return
+    clearTimeout(doneTimer)
+    progress.classList.remove('is-done')
+    void progress.offsetWidth
+    progress.classList.add('is-loading')
+  })
+  document.addEventListener('astro:after-swap', () => {
+    tuck(false)
+    lastY = window.scrollY
+    if (!progress) return
+    progress.classList.remove('is-loading')
+    progress.classList.add('is-done')
+    doneTimer = window.setTimeout(() => progress.classList.remove('is-done'), 600)
+  })
 
   // The mark turns a quarter each time you change page.
   document.addEventListener('astro:before-preparation', () => {
