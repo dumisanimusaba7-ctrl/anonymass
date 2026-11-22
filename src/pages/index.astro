@@ -14,7 +14,9 @@ import pouchSealer from '../assets/products/pouch-sealer.jpg'
 import autoclave from '../assets/products/autoclave.jpg'
 import sterileShelving from '../assets/products/sterile-shelving.jpg'
 
-const headline = 'Send one list. Equip the ward, the theatre and the lab.'
+// "one list." is the highlighted phrase, so it rises as a single unit.
+const highlight = 'one list.'
+const headline = ['Send', highlight, ...'Equip the ward, the theatre and the lab.'.split(' ')]
 const lab = departmentBySlug('laboratory')!
 const stations = [
   { step: 'Pack', name: 'Packing tables', image: packingTable, alt: 'Stainless packing table' },
@@ -35,10 +37,18 @@ const stations = [
         <p class="eyebrow">Medical supplies · Kitwe, Zambia</p>
         <h1 class="split">
           {
-            headline.split(' ').map((word, i) => (
+            headline.map((word, i) => (
               <>
                 <span class="split__w">
-                  <span style={`--i:${i}`}>{word}</span>
+                  <span style={`--i:${i}`}>
+                    {word === highlight ? (
+                      <mark class="hl" style={`--hl-delay:${200 + headline.length * 55 + 120}ms`}>
+                        {word}
+                      </mark>
+                    ) : (
+                      word
+                    )}
+                  </span>
                 </span>{' '}
               </>
             ))
@@ -49,7 +59,7 @@ const stations = [
           send us the list, and we reply with a quote.
         </p>
         <div class="hero__actions">
-          <a class="btn btn--light" href="/products">Start a quote list</a>
+          <a class="btn btn--quote" href="/products">Start a quote list</a>
           <a class="btn btn--outline-light" href={whatsappLink('Hello Optima, I would like a quote for:')}>
             WhatsApp us
           </a>
@@ -78,7 +88,7 @@ const stations = [
       <div class="depts__head" data-reveal>
         <h2 id="depts-title">What we supply</h2>
         <p class="lead">
-          <span data-count-to={categoryCount}>{categoryCount}</span> product categories in six departments, from our 2024
+          <span class="text-red" data-count-to={categoryCount}>{categoryCount}</span> product categories in six departments, from our 2024
           company profile. Pick a department to see what's in it.
         </p>
       </div>

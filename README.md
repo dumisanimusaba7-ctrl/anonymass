@@ -23,6 +23,7 @@ Visitors browse the range, add products to a **quote list**, and send that list 
 - **Type**: Saira Extra Condensed for headings (closest free match to the tall, rounded wordmark) and Jost for body text (a geometric face in the spirit of the Century Gothic used in the profile). Both are self-hosted.
 - **Logo**: the four-blade mark is redrawn as an SVG from a 400 dpi render of the profile, keeping its 90° symmetry. It always sits on indigo, as in the profile.
 - **Signature element**: the logo blades. They assemble when the home page opens and morph into a red medical cross as you scroll. The header mark turns a quarter each time you change page.
+- **Red means "get a quote".** Red is the one accent colour and is kept for asking for a quote: "Start a quote list", the WhatsApp send buttons for the quote list, "Open my quote list" and the quote counter. Elsewhere red appears at most once per screen: a white-on-red highlight on indigo (the hero's "one list.") or plain red text on light backgrounds. Red text is never placed directly on indigo, where it fails contrast. Error messages use a darker red so they are not confused with actions.
 - **Brand devices reused**: circular photo "lenses" with an ice-blue rim (profile cover), sky-blue label bars over product photos (profile catalogue pages), and the red-and-ice wave (cover), used once, on top of the footer.
 
 ### Anti-AI-Slop Guide checklist
@@ -41,7 +42,7 @@ Visitors browse the range, add products to a **quote list**, and send that list 
 
 All motion is tied to something the visitor does, and every piece is switched off under `prefers-reduced-motion`.
 
-- Hero: the headline rises in word by word on arrival; the logo blades assemble, then morph into a red medical cross as you scroll, while the three photo circles drift at different depths.
+- Hero: the headline rises in word by word on arrival and a red highlight sweeps in behind "one list."; the logo blades assemble, then morph into a red medical cross as you scroll, while the three photo circles drift at different depths.
 - Header: slides away while you scroll down to read and comes back as soon as you scroll up (or tab into it).
 - Page transitions (Astro view transitions): a thin red progress bar runs along the top, the header stays put, content fades up, and a department's photo and title morph into the department page header.
 - Department explorer: an indigo marker slides to the chosen department, the row scrolls it into the middle on phones, the panel height eases between departments, and the photo opens with a circular wipe.

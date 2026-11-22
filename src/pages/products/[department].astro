@@ -93,7 +93,7 @@ const itemTotal = d.categories.reduce((n, c) => n + (c.items?.length ?? 0), 0)
         </p>
       </div>
       <div class="ask__actions">
-        <a class="btn" href="/quote">Open my quote list</a>
+        <a class="btn btn--quote" href="/quote">Open my quote list</a>
         <a class="btn btn--outline" href={whatsappLink(`Hello Optima, I am looking for an item under ${d.name}: `)}>
           Ask on WhatsApp
         </a>
