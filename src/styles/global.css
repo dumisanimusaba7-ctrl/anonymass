@@ -427,20 +427,25 @@ select {
   line-height: 1.05;
   padding: var(--s-3) var(--s-4) 10px;
 }
+/* Photo wells have a fixed shape. The photo is pinned inside and centred,
+   capped by the well on both axes, so it can never push the box open, on
+   any browser. (Small photos are never enlarged past 1.5× via --max-w.) */
 .plate__well {
-  display: grid;
-  place-items: center;
+  position: relative;
+  display: block;
   background: #fff;
-  padding: var(--s-4);
   aspect-ratio: 4 / 3;
   border-bottom: 1px solid var(--border);
   overflow: hidden;
 }
 .plate__well img {
-  max-height: 100%;
-  max-width: min(100%, var(--max-w, 100%));
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: auto;
-  object-fit: contain;
+  height: auto;
+  max-width: min(100% - 32px, var(--max-w, 100%));
+  max-height: calc(100% - 32px);
   transition: transform var(--dur-3) var(--ease-out);
 }
 .plate:hover .plate__well img {

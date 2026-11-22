@@ -661,7 +661,7 @@ const stations = [
   }
   @media (min-width: 640px) {
     .lab__lists {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
   .lab__group h3 {
@@ -709,13 +709,13 @@ const stations = [
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-4);
     counter-reset: flow;
   }
   @media (min-width: 768px) {
     .flow {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
   .flow__station {
@@ -743,15 +743,19 @@ const stations = [
     }
   }
   .flow__img {
-    display: grid;
-    place-items: center;
+    position: relative;
     aspect-ratio: 1;
     margin-bottom: var(--s-2);
+    overflow: hidden;
   }
   .flow__img :global(img) {
-    max-height: 100%;
+    position: absolute;
+    inset: 0;
+    margin: auto;
     width: auto;
-    object-fit: contain;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
   }
   .flow__step {
     font-family: var(--font-display);

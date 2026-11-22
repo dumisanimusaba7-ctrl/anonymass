@@ -274,3 +274,40 @@ test('every page has a link-preview card that loads', async ({ page, request }) 
     expect((await res.body()).length).toBeLessThan(300_000)
   }
 })
+
+test('photos and captions stay inside their boxes on phones', async ({ browser }) => {
+  for (const width of [360, 390, 412]) {
+    const ctx = await browser.newContext({ viewport: { width, height: 800 }, isMobile: true, hasTouch: true })
+    const page = await ctx.newPage()
+    for (const path of ['/', '/products', '/products/sterile-services', '/sterile-services']) {
+      await page.goto(path)
+      await settle(page)
+      // Load every lazy image before measuring.
+      await page.evaluate(async () => {
+        for (const img of document.querySelectorAll('img')) {
+          img.loading = 'eager'
+          if (!img.complete) await new Promise((r) => img.addEventListener('load', r, { once: true }))
+        }
+      })
+      await page.waitForTimeout(950) // let reveal zoom settle
+      const spills = await page.evaluate(() => {
+        const out: string[] = []
+        const inside = (a: DOMRect, b: DOMRect) =>
+          a.left >= b.left - 1 && a.right <= b.right + 1 && a.top >= b.top - 1 && a.bottom <= b.bottom + 1
+        for (const well of document.querySelectorAll('.plate__well, .flow__img, .cssd__img')) {
+          const img = well.querySelector('img')
+          if (img && !inside(img.getBoundingClientRect(), well.getBoundingClientRect()))
+            out.push(`img in ${well.className}: ${img.getAttribute('alt')}`)
+        }
+        for (const card of document.querySelectorAll('.flow__station, .plate, .cssd__card')) {
+          for (const child of card.children)
+            if (!inside(child.getBoundingClientRect(), card.getBoundingClientRect()))
+              out.push(`${child.className} spills out of ${card.className}`)
+        }
+        return out
+      })
+      expect(spills, `${path} at ${width}px`).toEqual([])
+    }
+    await ctx.close()
+  }
+})
